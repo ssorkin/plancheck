@@ -1,0 +1,200 @@
+# Registry of AHJs (authorities having jurisdiction) and their data sources.
+#
+# Every pipeline stage is driven from this file: `pc acquire` downloads each entry under
+# `sources`, `geometries`, `reference` and `covariates`; `pc ingest` maps each source into
+# the common permits schema with the mapper named here (a function exported by
+# `plancheck.ahj.<slug>.MAPPERS`); `pc geocode` runs the tier chain named under `chain`.
+# Adding an AHJ = one block here + one package under src/plancheck/ahj/.
+
+ahjs:
+  la_city:
+    name: City of Los Angeles
+    # Sanity bounding box for any coordinate claimed to be inside the AHJ (WGS84).
+    bbox: {lat_min: 33.70, lat_max: 34.35, lon_min: -118.70, lon_max: -118.10}
+    socrata_domain: data.lacity.org
+
+    # Permit tables. `family` groups the era-split datasets that share one schema.
+    # `partition_date` is the column the parquet `year` partition is derived from.
+    sources:
+      ladbs_building_issued_2020:
+        {family: ladbs_building_issued, kind: socrata, dataset_id: pi9x-tg5x,
+         permit_class: building, record_kind: issued, mapper: ladbs_building,
+         partition_date: issue_date,
+         title: "Building and Safety - Building Permits Issued from 2020 to Present (N)"}
+      ladbs_building_issued_2010:
+        {family: ladbs_building_issued, kind: socrata, dataset_id: dyxf-7hc4,
+         permit_class: building, record_kind: issued, mapper: ladbs_building,
+         partition_date: issue_date,
+         title: "Building and Safety - Building Permits Issued Between 2010 and 2019 (N)"}
+      ladbs_building_issued_pre2010:
+        {family: ladbs_building_issued, kind: socrata, dataset_id: e67z-kt2n,
+         permit_class: building, record_kind: issued, mapper: ladbs_building,
+         partition_date: issue_date,
+         title: "Building and Safety - Building Permits Issued Before 2010 (N)"}
+      ladbs_building_submitted_2020:
+        {family: ladbs_building_submitted, kind: socrata, dataset_id: gwh9-jnip,
+         permit_class: building, record_kind: submitted, mapper: ladbs_building,
+         partition_date: submitted_date,
+         title: "Building and Safety - Building Permits Submitted from 2020 to Present (N)"}
+      ladbs_building_submitted_2010:
+        {family: ladbs_building_submitted, kind: socrata, dataset_id: n3xg-rixm,
+         permit_class: building, record_kind: submitted, mapper: ladbs_building,
+         partition_date: submitted_date,
+         title: "Building and Safety - Building Permits Submitted Between 2010 and 2019 (N)"}
+      ladbs_building_submitted_pre2010:
+        {family: ladbs_building_submitted, kind: socrata, dataset_id: b6ii-mhed,
+         permit_class: building, record_kind: submitted, mapper: ladbs_building,
+         partition_date: submitted_date,
+         title: "Building and Safety - Building Permits Submitted Before 2010 (N)"}
+      ladbs_mechanical_issued_2020:
+        {family: ladbs_mechanical_issued, kind: socrata, dataset_id: 67is-svtd,
+         permit_class: mechanical, record_kind: issued, mapper: ladbs_trade,
+         partition_date: issue_date,
+         title: "Building and Safety - Mechanical Permits Issued from 2020 to Present (N)"}
+      ladbs_mechanical_issued_2010:
+        {family: ladbs_mechanical_issued, kind: socrata, dataset_id: 5m3t-xjex,
+         permit_class: mechanical, record_kind: issued, mapper: ladbs_trade,
+         partition_date: issue_date,
+         title: "Building and Safety - Mechanical Permits Issued Between 2010 and 2019 (N)"}
+      ladbs_mechanical_issued_pre2010:
+        {family: ladbs_mechanical_issued, kind: socrata, dataset_id: mcip-sa6g,
+         permit_class: mechanical, record_kind: issued, mapper: ladbs_trade,
+         partition_date: issue_date,
+         title: "Building and Safety - Mechanical Permits Issued Before 2010 (N)"}
+      ladbs_mechanical_submitted_2020:
+        {family: ladbs_mechanical_submitted, kind: socrata, dataset_id: 9rag-xmmd,
+         permit_class: mechanical, record_kind: submitted, mapper: ladbs_trade,
+         partition_date: submitted_date,
+         title: "Building and Safety - Mechanical Permits Submitted from 2020 to Present (N)"}
+      ladbs_mechanical_submitted_2010:
+        {family: ladbs_mechanical_submitted, kind: socrata, dataset_id: bjvp-eqku,
+         permit_class: mechanical, record_kind: submitted, mapper: ladbs_trade,
+         partition_date: submitted_date,
+         title: "Building and Safety - Mechanical Permits Submitted Between 2010 and 2019 (N)"}
+      ladbs_mechanical_submitted_pre2010:
+        {family: ladbs_mechanical_submitted, kind: socrata, dataset_id: vnau-u5ph,
+         permit_class: mechanical, record_kind: submitted, mapper: ladbs_trade,
+         partition_date: submitted_date,
+         title: "Building and Safety - Mechanical Permits Submitted Before 2010 (N)"}
+      ladbs_electrical_issued_2020:
+        {family: ladbs_electrical_issued, kind: socrata, dataset_id: ysqd-apz7,
+         permit_class: electrical, record_kind: issued, mapper: ladbs_trade,
+         partition_date: issue_date,
+         title: "Building and Safety - Electrical Permits Issued from 2020 to Present (N)"}
+      ladbs_electrical_issued_2010:
+        {family: ladbs_electrical_issued, kind: socrata, dataset_id: yaaf-cyfa,
+         permit_class: electrical, record_kind: issued, mapper: ladbs_trade,
+         partition_date: issue_date,
+         title: "Building and Safety - Electrical Permits Issued Between 2010 and 2019 (N)"}
+      ladbs_electrical_issued_pre2010:
+        {family: ladbs_electrical_issued, kind: socrata, dataset_id: h8me-eag6,
+         permit_class: electrical, record_kind: issued, mapper: ladbs_trade,
+         partition_date: issue_date,
+         title: "Building and Safety - Electrical Permits Issued Before 2010 (N)"}
+      ladbs_electrical_submitted_2020:
+        {family: ladbs_electrical_submitted, kind: socrata, dataset_id: 9k3p-zrda,
+         permit_class: electrical, record_kind: submitted, mapper: ladbs_trade,
+         partition_date: submitted_date,
+         title: "Building and Safety - Electrical Permits Submitted from 2020 to Present (N)"}
+      ladbs_electrical_submitted_2010:
+        {family: ladbs_electrical_submitted, kind: socrata, dataset_id: 9i2c-csvn,
+         permit_class: electrical, record_kind: submitted, mapper: ladbs_trade,
+         partition_date: submitted_date,
+         title: "Building and Safety - Electrical Permits Submitted Between 2010 and 2019 (N)"}
+      ladbs_electrical_submitted_pre2010:
+        {family: ladbs_electrical_submitted, kind: socrata, dataset_id: 7ts7-nh4y,
+         permit_class: electrical, record_kind: submitted, mapper: ladbs_trade,
+         partition_date: submitted_date,
+         title: "Building and Safety - Electrical Permits Submitted Before 2010 (N)"}
+      boe_permits:
+        {family: boe_permits, kind: socrata, dataset_id: j7mw-thyc,
+         permit_class: right_of_way, record_kind: issued, mapper: boe,
+         partition_date: permitissuedate,
+         title: "Bureau of Engineering Permit Information"}
+
+    # Authoritative per-permit geometries published by the AHJ itself (joined by key
+    # before any geocoder is consulted).
+    geometries:
+      boe_geocoder:
+        kind: arcgis_mapserver
+        url: https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer
+        layer_name_regex: " (Points|Lines|Polygons)$"
+        key_field: RefNo
+        out_fields: "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+        order_by: ID
+
+    # Administrative polygons every located permit is joined to (all EPSG:4326).
+    # `id_field`/`name_field` are asserted against the layer schema at acquire time.
+    reference:
+      council_districts:
+        url: https://maps.lacity.org/arcgis/rest/services/Mapping/Boundaries/MapServer/4
+        id_field: District
+        name_field: District_Name
+        out_fields: "OBJECTID,NAME,District,District_Name,Effective,Revised"
+        order_by: OBJECTID
+      community_plan_areas:
+        url: https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Community_Plan_Areas/FeatureServer/0
+        id_field: CPA_NUM
+        name_field: NAME_ALF
+        out_fields: "OBJECTID,CPA_NUM,NAME_ALF"
+        order_by: OBJECTID
+      neighborhood_councils:
+        url: https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Neighborhood_Council_Boundaries_(2018)/FeatureServer/0
+        id_field: FID
+        name_field: Name
+        out_fields: "FID,Name"
+        order_by: FID
+      city_boundary:
+        url: https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/City_Boundary_of_Los_Angeles/FeatureServer/0
+        id_field: objectid
+        name_field: city
+        out_fields: "objectid,city"
+        order_by: objectid
+
+    # Covariate layers for the relationship analyses (joined at geocode time).
+    covariates:
+      zoning:
+        url: https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Zoning/FeatureServer/15
+        id_field: OBJECTID
+        name_field: Zoning
+        out_fields: "OBJECTID,Zoning,CATEGORY"
+        order_by: OBJECTID
+        join: polygon
+      hpoz:
+        url: https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Historic_Preservation_Overlay_Zones/FeatureServer/0
+        id_field: OBJECTID
+        name_field: NAME
+        out_fields: "*"
+        order_by: OBJECTID
+        join: polygon
+      rail_stations:
+        url: https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Metro_Rail_Stations_2026/FeatureServer/0
+        id_field: OBJECTID
+        name_field: STATION
+        out_fields: "*"
+        order_by: OBJECTID
+        join: nearest
+
+    # Batch geocoders, in the order the chain consults them. `fields` maps the generic
+    # query parts onto each locator's address fields (Esri single-line input is NOT
+    # accepted by these county/city locators).
+    geocoders:
+      cams:
+        kind: arcgis_locator
+        url: https://public.gis.lacounty.gov/public/rest/services/CAMS_Locator/GeocodeServer
+        fields: {street: Street, city: City, state: State, zip: ZIP}
+        default_city: LOS ANGELES
+        default_state: CA
+        batch_size: 1000
+        min_score: 90
+        intersection_joiner: " & "
+      centerline:
+        kind: arcgis_locator
+        url: https://maps.lacity.org/arcgis/rest/services/Locators/centerlineLocator/GeocodeServer
+        fields: {street: Street, zip: ZIP}
+        batch_size: 1000
+        min_score: 90
+        intersection_joiner: " & "
+
+    # Tier chain for `pc geocode`; names resolve in plancheck.ahj.la_city.build_tiers.
+    chain: [source_coords, boe_geometry, cams, centerline]

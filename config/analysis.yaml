@@ -1,0 +1,38 @@
+# Analysis tunables. Echoed into every export (data/export/meta.json) so no figure or
+# page carries a threshold the pipeline does not also carry.
+
+years:
+  start: 2013     # first full year of the intensity series (LADBS coordinates are sparse earlier)
+  end: 2026
+
+geocode:
+  min_score: 90            # Esri locator score floor (0-100)
+  address_match_types: [PointAddress, StreetAddress, Subaddress, StreetAddressExt]
+  intersection_match_types: [StreetInt]
+  throttle_seconds: 0.5    # between locator batches
+
+hexes:
+  resolutions: [8, 9]      # H3 resolutions assigned to every located permit
+
+census:
+  acs_vintage: 2024        # ACS 5-year release (window 2020-2024)
+  state_fips: "06"
+  county_fips: "037"
+  tables:
+    B01003: total population
+    B19013: median household income
+    B25003: tenure (owner / renter occupied)
+    B25035: median year structure built
+    B25001: housing units
+    B25024: units in structure
+    B03002: hispanic or latino origin by race
+
+intensity:
+  # Permit types counted as "new building" / "addition" / "demolition" in LADBS.
+  new_building_types: [Bldg-New]
+  addition_types: [Bldg-Addition]
+  demolition_types: [Bldg-Demolition]
+
+figures:
+  dpi: 150
+  choropleth_quantiles: 7
