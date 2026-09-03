@@ -30,7 +30,7 @@
     <label>Class <select id="cls"><option value="building">Building</option><option value="electrical">Electrical</option><option value="mechanical">Mechanical</option><option value="right_of_way">Right-of-way (BOE)</option></select></label>
     <label>Metric <select id="metric"></select></label>
     <label>Years <span id="yr0"></span>–<span id="yr1"></span> <input id="y0" type="range"> <input id="y1" type="range"></label>
-    <label><input id="perkm2" type="checkbox" checked> per km²</label>
+    <label><input id="perkm2" type="checkbox" checked> per acre</label>
     <span class="note" id="note"></span>
   </header>
   <div id="map"></div>
@@ -57,7 +57,7 @@ function value(props){
   let v = 0, any=false;
   for (let y=state.y0; y<=state.y1; y++){ const yy=c[String(y)]; if(yy && yy[state.metric]!=null){ v+=yy[state.metric]; any=true; } }
   if(!any) return null;
-  if(state.perkm2 && props.area_km2>0) v = v/props.area_km2;
+  if(state.perkm2 && props.area_km2>0) v = v/(props.area_km2*247.105);
   return v;
 }
 function quantiles(vals, n){ const s=[...vals].filter(v=>v!=null && isFinite(v)).sort((a,b)=>a-b); if(!s.length) return []; return Array.from({length:n-1},(_,i)=>s[Math.floor((i+1)*s.length/n)]); }
@@ -78,7 +78,7 @@ function render(){
   geoLayer = L.geoJSON(fc, {
     style: f => { const v=value(f.properties); const c=colorOf(v); return {weight:0.4, color:"#ffffff", fillColor:c||"#ffffff", fillOpacity:c?0.82:0}; },
     onEachFeature: (f, l) => {
-      l.bindTooltip(() => { const p=f.properties; const v=value(p); const id=p.name||p.id; const fmt = v==null?"no permits":(state.metric==="valuation_sum"? "$"+Math.round(v).toLocaleString() : v.toLocaleString(undefined,{maximumFractionDigits: Math.abs(v)<10?1:0})); const acs = p.acs? `<br><span style="color:#898781">income $${(p.acs.median_hh_income||0).toLocaleString()} · renters ${Math.round((p.acs.renter_share||0)*100)}%</span>`:""; return `<b>${id}</b><br>${METRIC_LABELS[state.metric]}${state.perkm2?" per km²":""}: ${fmt}${acs}`; }, {className:"pc", sticky:true});
+      l.bindTooltip(() => { const p=f.properties; const v=value(p); const id=p.name||p.id; const fmt = v==null?"no permits":(state.metric==="valuation_sum"? "$"+Math.round(v).toLocaleString() : v.toLocaleString(undefined,{maximumFractionDigits: Math.abs(v)<10?1:0})); const acs = p.acs? `<br><span style="color:#898781">income $${(p.acs.median_hh_income||0).toLocaleString()} · renters ${Math.round((p.acs.renter_share||0)*100)}%</span>`:""; return `<b>${id}</b><br>${METRIC_LABELS[state.metric]}${state.perkm2?" per acre":""}: ${fmt}${acs}`; }, {className:"pc", sticky:true});
       l.on("mouseover", () => l.setStyle({weight:2, color:"#eda100"}));
       l.on("mouseout", () => geoLayer.resetStyle(l));
     }
@@ -87,7 +87,7 @@ function render(){
   if (legend) legend.remove();
   legend = L.control({position:"bottomright"});
   legend.onAdd = () => { const d=L.DomUtil.create("div","legend"); const fmt=x=>state.metric==="valuation_sum"?"$"+Math.round(x).toLocaleString():x.toLocaleString(undefined,{maximumFractionDigits:1});
-    d.innerHTML = `<b>${METRIC_LABELS[state.metric]}</b>${state.perkm2?" per km²":""}, ${state.y0}–${state.y1}<br>` + (diverging? DIV.map((c,i)=>`<span class="sw" style="background:${c}"></span>${i===0?"≤ "+fmt(breaks[0]):i===DIV.length-1?"≥ "+fmt(breaks[4]):i===4?"0":""}<br>`).join("") : RAMP.map((c,i)=>`<span class="sw" style="background:${c}"></span>${i<breaks.length? "≤ "+fmt(breaks[i]) : "> "+fmt(breaks[breaks.length-1])}<br>`).join(""));
+    d.innerHTML = `<b>${METRIC_LABELS[state.metric]}</b>${state.perkm2?" per acre":""}, ${state.y0}–${state.y1}<br>` + (diverging? DIV.map((c,i)=>`<span class="sw" style="background:${c}"></span>${i===0?"≤ "+fmt(breaks[0]):i===DIV.length-1?"≥ "+fmt(breaks[4]):i===4?"0":""}<br>`).join("") : RAMP.map((c,i)=>`<span class="sw" style="background:${c}"></span>${i<breaks.length? "≤ "+fmt(breaks[i]) : "> "+fmt(breaks[breaks.length-1])}<br>`).join(""));
     return d; };
   legend.addTo(map);
 }

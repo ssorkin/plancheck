@@ -37,7 +37,7 @@ def main() -> None:
         .agg(pl.col("n_permits").sum())
     )
     df = tracts.join(agg, left_on="geoid", right_on="geo_id", how="inner")
-    vals = df["n_permits"].to_numpy() / (df["arealand_m2"].to_numpy() / 1e6)
+    vals = df["n_permits"].to_numpy() / (df["arealand_m2"].to_numpy() / 4046.86)
     vals[~np.isfinite(vals)] = np.nan
     city = PARQUET_DIR / "ref" / "ahj=la_city" / "layer=city_boundary" / "data.parquet"
     wkbs = pl.read_parquet(city)["wkb"].to_list() if city.exists() else []
@@ -80,7 +80,7 @@ def main() -> None:
     fig.text(
         0.05,
         0.16,
-        f"Building permits per km², {y0}–{y1}  ·  plancheck.sorkinlabs.com",
+        f"Building permits per acre, {y0}–{y1}  ·  plancheck.sorkinlabs.com",
         color="#737b86",
         fontsize=12,
         va="top",

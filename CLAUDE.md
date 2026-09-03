@@ -71,6 +71,8 @@ page in `site/index.html`). AHJs are pluggable: `config/sources.yaml` + `src/pla
   shapefiles), matplotlib Agg figures using the reference dataviz palette in
   `analysis/geo_plot.py` (one sequential hue for magnitude, blue–red with gray midpoint for
   polarity, fixed categorical order).
+- Areas and rates are imperial: acres and per-acre, never km² (internal `area_km2`
+  fields are converted at display time, 247.105 acres per km²).
 - Copy describes associations ("correlated with"), never causes; the final year is
   labelled partial.
 - Adding an AHJ: one block in `config/sources.yaml` (sources, geometries, reference,

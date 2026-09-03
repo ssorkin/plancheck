@@ -99,7 +99,7 @@ select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px s
             <label>From <span class="yrlbl" id="yr0"></span><input id="y0" type="range"></label>
             <label>To <span class="yrlbl" id="yr1"></span><input id="y1" type="range"></label>
           </div>
-          <label class="check"><input id="perkm2" type="checkbox" checked> Per km² of land</label>
+          <label class="check"><input id="perkm2" type="checkbox" checked> Per acre of land</label>
         </div>
       </div>
       <div class="panel"><h2>Legend</h2><div class="legend" id="legend"></div></div>
@@ -122,7 +122,7 @@ const S = {geo:"tract", cls:"building", metric:"n_permits", y0:D.years.start, y1
 function syncHash(){ const h = new URLSearchParams({geo:S.geo, cls:S.cls, metric:S.metric, y0:S.y0, y1:S.y1, per:S.perkm2?"1":"0"}); if (typeof map !== "undefined" && map._loaded) { const c = map.getCenter(); h.set("v", `${c.lat.toFixed(4)},${c.lng.toFixed(4)},${map.getZoom()}`); } history.replaceState(null, "", "#" + h.toString()); }
 function detailUrl(p){ const q = new URLSearchParams({geo:S.geo, id:p.id, cls:S.cls, metric:S.metric, y0:S.y0, y1:S.y1}); return `${DETAIL_BASE}?${q}`; }
 const FEATS = () => D.geos[S.geo].fc.features;
-const fmt = (v, m) => v==null ? "—" : (m==="valuation_sum" ? "$"+Math.round(v).toLocaleString() : Math.abs(v) < 10 ? v.toLocaleString(undefined,{maximumFractionDigits:1}) : Math.round(v).toLocaleString());
+const fmt = (v, m) => v==null ? "—" : (m==="valuation_sum" ? "$"+Math.round(v).toLocaleString() : Math.abs(v) < 1 ? v.toLocaleString(undefined,{maximumFractionDigits:2}) : Math.abs(v) < 10 ? v.toLocaleString(undefined,{maximumFractionDigits:1}) : Math.round(v).toLocaleString());
 // Which metrics each class actually carries (e.g. new buildings and dwelling units exist only on building permits).
 const AVAIL = {};
 for (const f of D.geos.tract.fc.features) for (const cls of Object.keys(CLASS_LABEL)) { const c = f.properties[cls]; if (!c) continue; const a = AVAIL[cls] || (AVAIL[cls] = new Set()); for (const yy of Object.values(c)) for (const [k, v] of Object.entries(yy)) if (v) a.add(k); }
@@ -146,7 +146,7 @@ function value(p){
   let v = 0, any = false;
   for (let y = S.y0; y <= S.y1; y++){ const yy = c[String(y)]; if (yy && yy[S.metric]!=null){ v += yy[S.metric]; any = true; } }
   if (!any) return null;
-  if (S.perkm2 && p.area_km2 > 0) v = v / p.area_km2;
+  if (S.perkm2 && p.area_km2 > 0) v = v / (p.area_km2 * 247.105);
   return v;
 }
 function areaTitle(p){
@@ -178,7 +178,7 @@ function render(){
       l.bindTooltip(() => {
         const p = f.properties, v = value(p);
         const acs = p.acs ? `<div class="m">income ${p.acs.median_hh_income ? "$"+p.acs.median_hh_income.toLocaleString() : "—"} · renters ${p.acs.renter_share!=null ? Math.round(p.acs.renter_share*100)+"%" : "—"} · built ${p.acs.median_year_built || "—"}</div>` : "";
-        return `<b>${areaTitle(p)}</b><div>${METRICS[S.metric]}${S.perkm2 ? " per km²" : ""}, ${S.y0}–${S.y1}: <b>${fmt(v, S.metric)}</b></div>${acs}<div class="go">Click to list these permits</div>`;
+        return `<b>${areaTitle(p)}</b><div>${METRICS[S.metric]}${S.perkm2 ? " per acre" : ""}, ${S.y0}–${S.y1}: <b>${fmt(v, S.metric)}</b></div>${acs}<div class="go">Click to list these permits</div>`;
       }, {className:"pc", sticky:true, direction:"top", opacity:1});
       l.on("mouseover", () => l.setStyle({weight:2, color:"#eda100"}));
       l.on("mouseout", () => layer.resetStyle(l));
@@ -187,7 +187,7 @@ function render(){
   }).addTo(map);
   cdLayer.addTo(map); cdLayer.bringToFront();
   const lg = document.getElementById("legend");
-  const cap = `<div class="cap">${METRICS[S.metric]}${S.perkm2 ? " per km²" : ""}, ${S.y0}–${S.y1} · ${D.geos[S.geo].label.toLowerCase()}</div>`;
+  const cap = `<div class="cap">${METRICS[S.metric]}${S.perkm2 ? " per acre" : ""}, ${S.y0}–${S.y1} · ${D.geos[S.geo].label.toLowerCase()}</div>`;
   const rows = div
     ? DIV.map((c,i) => `<div class="row"><span class="sw" style="background:${c}"></span><span>${i===0 ? "≤ "+fmt(breaks[0]) : i===DIV.length-1 ? "≥ "+fmt(breaks[4]) : i===4 ? "0" : ""}</span></div>`)
     : RAMP.map((c,i) => `<div class="row"><span class="sw" style="background:${c}"></span><span>${i < breaks.length ? "≤ "+fmt(breaks[i], S.metric) : "> "+fmt(breaks[breaks.length-1], S.metric)}</span></div>`);

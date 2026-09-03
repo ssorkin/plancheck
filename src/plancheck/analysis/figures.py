@@ -92,8 +92,8 @@ def fig_tract_choropleth(
 ) -> Path:
     df = _tract_frame(intensity, years, permit_class, metric)
     vals = df[metric].to_numpy().astype(float)
-    if per_km2:
-        vals = vals / (df["arealand_m2"].to_numpy() / 1e6)
+    if per_km2:  # per acre (the option name predates the unit change)
+        vals = vals / (df["arealand_m2"].to_numpy() / 4046.86)
     vals[~np.isfinite(vals)] = np.nan
     vals_plot = vals.copy()
     if diverging:
@@ -108,7 +108,7 @@ def fig_tract_choropleth(
     outline(ax, _city_wkbs(ahj_slug))
     set_geo_axes(ax, _city_bounds(ahj_slug))
     cb = fig.colorbar(ax.collections[0], ax=ax, shrink=0.5, pad=0.01)
-    cb.set_label(("per km²" if per_km2 else "total") + f", {years[0]}–{years[1]}", color=INK2)
+    cb.set_label(("per acre" if per_km2 else "total") + f", {years[0]}–{years[1]}", color=INK2)
     cb.outline.set_visible(False)
     ax.set_title(title, fontsize=13, loc="left")
     ax.text(
@@ -151,7 +151,7 @@ def fig_hex_density(
     outline(ax, _city_wkbs(ahj_slug))
     set_geo_axes(ax, _city_bounds(ahj_slug))
     cb = fig.colorbar(ax.collections[0], ax=ax, shrink=0.5, pad=0.01)
-    cb.set_label(f"per H3 r8 cell (~0.74 km²), {years[0]}–{years[1]}", color=INK2)
+    cb.set_label(f"per H3 r8 cell (~182 acres), {years[0]}–{years[1]}", color=INK2)
     cb.outline.set_visible(False)
     ax.set_title(title, fontsize=13, loc="left")
     return _save(fig, name or f"hex_{metric}_{permit_class or 'all'}")
@@ -188,7 +188,7 @@ def fig_small_multiples(
     for ax, year in zip(axes, years, strict=False):
         agg = d.filter(pl.col("year") == year).group_by("geo_id").agg(pl.col(metric).sum())
         df = tracts.join(agg, left_on="geoid", right_on="geo_id", how="left")
-        vals = df[metric].to_numpy().astype(float) / (df["arealand_m2"].to_numpy() / 1e6)
+        vals = df[metric].to_numpy().astype(float) / (df["arealand_m2"].to_numpy() / 4046.86)
         vals[~np.isfinite(vals)] = np.nan
         ax.add_collection(
             poly_collection(df["wkb"].to_list(), vals.tolist(), cmap=CMAP_SEQ, vmin=0, vmax=vmax)

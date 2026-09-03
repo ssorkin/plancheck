@@ -48,10 +48,10 @@ def run_analysis(ahj: str = "all", figures: bool = True) -> None:
             continue
         outs = [
             F.fig_tract_choropleth(
-                a.slug, tr, "n_permits", "Building permits issued per km²", (y0, y1), "building"
+                a.slug, tr, "n_permits", "Building permits issued per acre", (y0, y1), "building"
             ),
             F.fig_tract_choropleth(
-                a.slug, tr, "n_new_building", "New-building permits per km²", (y0, y1), "building"
+                a.slug, tr, "n_new_building", "New-building permits per acre", (y0, y1), "building"
             ),
             F.fig_tract_choropleth(
                 a.slug,
@@ -64,13 +64,13 @@ def run_analysis(ahj: str = "all", figures: bool = True) -> None:
                 diverging=True,
             ),
             F.fig_tract_choropleth(
-                a.slug, tr, "n_adu", "ADU permits per km²", (2017, y1), "building"
+                a.slug, tr, "n_adu", "ADU permits per acre", (2017, y1), "building"
             ),
             F.fig_tract_choropleth(
                 a.slug,
                 tr,
                 "n_permits",
-                "Right-of-way (BOE) permits per km²",
+                "Right-of-way (BOE) permits per acre",
                 (y0, y1),
                 "right_of_way",
             ),
@@ -78,7 +78,7 @@ def run_analysis(ahj: str = "all", figures: bool = True) -> None:
                 a.slug,
                 tr,
                 "n_solar",
-                "Solar permits per km²",
+                "Solar permits per acre",
                 (y0, y1),
                 "electrical",
                 name="tract_n_solar_electrical",
@@ -106,7 +106,7 @@ def run_analysis(ahj: str = "all", figures: bool = True) -> None:
         years = [y for y in range(y0, y1 + 1) if (y - y0) % 2 == 0][:8]
         outs.append(
             F.fig_small_multiples(
-                a.slug, tr, "n_permits", "Building permits per km², by year", years
+                a.slug, tr, "n_permits", "Building permits per acre, by year", years
             )
         )
         if acs is not None:
@@ -172,7 +172,7 @@ def run_analysis(ahj: str = "all", figures: bool = True) -> None:
                     tot,
                     "pop_density_km2",
                     "permits_per_1k_units",
-                    "Population density (per km²)",
+                    "Population density (per acre)",
                     "Building permits per 1,000 units",
                     "scatter_density_permits",
                     logx=True,
