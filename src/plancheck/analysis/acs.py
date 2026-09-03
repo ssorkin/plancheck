@@ -44,9 +44,7 @@ def tract_covariates() -> pl.DataFrame | None:
     out = frames[0]
     for f in frames[1:]:
         out = out.join(f, on="geoid", how="full", coalesce=True)
-    tracts = pl.read_parquet(PARQUET_DIR / "tracts" / "data.parquet").select(
-        "geoid", "arealand_m2"
-    )
+    tracts = pl.read_parquet(PARQUET_DIR / "tracts" / "data.parquet").select("geoid", "arealand_m2")
     out = out.join(tracts, on="geoid", how="left").with_columns(
         (pl.col("renter_units") / pl.col("occ_units")).alias("renter_share"),
         (pl.col("pop") / (pl.col("arealand_m2") / 1e6)).alias("pop_density_km2"),

@@ -46,21 +46,21 @@ def metrics_sql(geo_col: str) -> str:
     cfg = analysis_config()["intensity"]
     return f"""
     SELECT ahj, {geo_col} AS geo_id, year, permit_class,
-           count(*) AS n_permits,
-           sum(CASE WHEN permit_type IN ({_list(cfg["new_building_types"])}) THEN 1 ELSE 0 END)
+           count(*)::BIGINT AS n_permits,
+           sum(CASE WHEN permit_type IN ({_list(cfg["new_building_types"])}) THEN 1 ELSE 0 END)::BIGINT
                AS n_new_building,
-           sum(CASE WHEN permit_type IN ({_list(cfg["addition_types"])}) THEN 1 ELSE 0 END)
+           sum(CASE WHEN permit_type IN ({_list(cfg["addition_types"])}) THEN 1 ELSE 0 END)::BIGINT
                AS n_additions,
-           sum(CASE WHEN permit_type IN ({_list(cfg["demolition_types"])}) THEN 1 ELSE 0 END)
+           sum(CASE WHEN permit_type IN ({_list(cfg["demolition_types"])}) THEN 1 ELSE 0 END)::BIGINT
                AS n_demolitions,
-           sum(CASE WHEN adu_changed THEN 1 ELSE 0 END) AS n_adu,
-           sum(CASE WHEN solar THEN 1 ELSE 0 END) AS n_solar,
-           sum(CASE WHEN ev THEN 1 ELSE 0 END) AS n_ev,
-           sum(valuation) AS valuation_sum,
-           median(valuation) AS valuation_median,
-           sum(dwelling_units_change) AS du_net,
-           sum(sqft) AS sqft_sum,
-           sum(CASE WHEN lat IS NULL THEN 1 ELSE 0 END) AS n_unlocated
+           sum(CASE WHEN adu_changed THEN 1 ELSE 0 END)::BIGINT AS n_adu,
+           sum(CASE WHEN solar THEN 1 ELSE 0 END)::BIGINT AS n_solar,
+           sum(CASE WHEN ev THEN 1 ELSE 0 END)::BIGINT AS n_ev,
+           sum(valuation)::DOUBLE AS valuation_sum,
+           median(valuation)::DOUBLE AS valuation_median,
+           sum(dwelling_units_change)::BIGINT AS du_net,
+           sum(sqft)::DOUBLE AS sqft_sum,
+           sum(CASE WHEN lat IS NULL THEN 1 ELSE 0 END)::BIGINT AS n_unlocated
     FROM issued
     WHERE {geo_col} IS NOT NULL
     GROUP BY 1, 2, 3, 4
@@ -80,7 +80,7 @@ def compute(con: duckdb.DuckDBPyConnection | None = None) -> dict[str, pl.DataFr
         out[f"intensity_{name}"] = df
     # Citywide series by class and by BOE subtype.
     out["series_class"] = con.execute(
-        "SELECT ahj, year, permit_class, count(*) AS n_permits, sum(valuation) AS valuation_sum, "
+        "SELECT ahj, year, permit_class, count(*)::BIGINT AS n_permits, sum(valuation)::DOUBLE AS valuation_sum, "
         "sum(dwelling_units_change) AS du_net FROM issued GROUP BY 1, 2, 3 ORDER BY 1, 2, 3"
     ).pl()
     out["series_type"] = con.execute(
@@ -96,9 +96,20 @@ def compute(con: duckdb.DuckDBPyConnection | None = None) -> dict[str, pl.DataFr
     return out
 
 
+def _plain(df: pl.DataFrame) -> pl.DataFrame:
+    """DuckDB returns DECIMAL for integer sums; keep the store to plain Int64/Float64."""
+    casts = []
+    for name, dtype in df.schema.items():
+        if isinstance(dtype, pl.Decimal):
+            casts.append(pl.col(name).cast(pl.Int64 if (dtype.scale or 0) == 0 else pl.Float64))
+    return df.with_columns(casts) if casts else df
+
+
 def write(frames: dict[str, pl.DataFrame]) -> None:
     d = PARQUET_DIR / "analysis"
     d.mkdir(parents=True, exist_ok=True)
     for name, df in frames.items():
+        df = _plain(df)
+        frames[name] = df
         df.write_parquet(d / f"{name}.parquet", compression="zstd")
         print(f"  {name}: {df.height:,} rows")
