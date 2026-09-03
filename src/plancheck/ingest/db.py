@@ -50,6 +50,7 @@ def build() -> list[str]:
     view("boe_geom", "boe_geom/ahj=*/layer=*/data.parquet")
     view("ref_layers", "ref/ahj=*/layer=*/data.parquet")
     view("tracts", "tracts/data.parquet", hive=False)
+    view("blocks", "blocks/data.parquet", hive=False)
     view("census_acs", "census_acs/*.parquet", hive=False)
     view("assessor", "assessor/*.parquet", hive=False)
     view("geocode_cache", "geocode_cache/geocoder=*/*.parquet")

@@ -1,4 +1,21 @@
 {
+  "blocks_2020_06037.geojsonl": {
+    "dataset": "tiger",
+    "filename": "blocks_2020_06037.geojsonl",
+    "url": "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2020/MapServer/10/query",
+    "sha256": "c153979c1bee97b2201d7a145813ccbf8b37106fa209910f4110eeae5dee9dcc",
+    "size": 15283033,
+    "downloaded_at": "2026-09-03T22:58:35+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "2020 census blocks (P.L. 94-171 POP100/HU100, internal points), county 06037",
+    "extra": {
+      "count": 91626,
+      "layer_name": "Census Blocks",
+      "where": "STATE='06' AND COUNTY='037'",
+      "out_fields": "GEOID,POP100,HU100,INTPTLAT,INTPTLON,AREALAND"
+    }
+  },
   "tracts_2020_06037.geojsonl": {
     "dataset": "tiger",
     "filename": "tracts_2020_06037.geojsonl",

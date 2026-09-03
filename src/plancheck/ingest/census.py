@@ -42,6 +42,36 @@ def ingest_tracts() -> None:
     print(f"  tracts: {df.height:,}")
 
 
+def ingest_blocks() -> None:
+    cfg = analysis_config()["census"]
+    path = RAW_DIR / "tiger" / f"blocks_2020_{cfg['state_fips']}{cfg['county_fips']}.geojsonl"
+    if not path.exists():
+        print(f"  skip blocks: {path} not downloaded")
+        return
+    rows = []
+    with path.open() as f:
+        for line in f:
+            p = json.loads(line)["properties"]
+            rows.append(
+                {
+                    "geoid": p["GEOID"],
+                    "tract_geoid": p["GEOID"][:11],
+                    "pop": int(p.get("POP100") or 0),
+                    "housing_units": int(p.get("HU100") or 0),
+                    "arealand_m2": float(p.get("AREALAND") or 0),
+                    "lat": float(p["INTPTLAT"]) if p.get("INTPTLAT") else None,
+                    "lon": float(p["INTPTLON"]) if p.get("INTPTLON") else None,
+                }
+            )
+    df = pl.DataFrame(rows)
+    out = PARQUET_DIR / "blocks"
+    out.mkdir(parents=True, exist_ok=True)
+    df.write_parquet(out / "data.parquet", compression="zstd")
+    print(
+        f"  blocks: {df.height:,} (pop {df['pop'].sum():,}, housing units {df['housing_units'].sum():,})"
+    )
+
+
 def ingest_acs() -> None:
     cfg = analysis_config()["census"]
     vintage, state, county = cfg["acs_vintage"], cfg["state_fips"], cfg["county_fips"]

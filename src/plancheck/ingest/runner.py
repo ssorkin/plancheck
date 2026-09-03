@@ -29,8 +29,9 @@ def run_ingest(ahj: str = "all", source: str = "all", family: str = "all") -> No
 
             ingest_assessor(a)
     if family in ("all", "census"):
-        from plancheck.ingest.census import ingest_acs, ingest_tracts
+        from plancheck.ingest.census import ingest_acs, ingest_blocks, ingest_tracts
 
         ingest_tracts()
+        ingest_blocks()
         ingest_acs()
     db.build()

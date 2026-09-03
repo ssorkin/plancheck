@@ -42,6 +42,9 @@ for slug in ORDER:
     for f in fc["features"]:
         p = f["properties"]
         slim = {"id": p["id"], "name": p["name"], "area_km2": p["area_km2"]}
+        for k in ("pop", "housing_units"):
+            if k in p:
+                slim[k] = p[k]
         for cls in ("building", "electrical", "mechanical", "right_of_way"):
             if cls in p:
                 slim[cls] = {

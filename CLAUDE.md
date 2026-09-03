@@ -71,6 +71,9 @@ page in `site/index.html`). AHJs are pluggable: `config/sources.yaml` + `src/pla
   shapefiles), matplotlib Agg figures using the reference dataviz palette in
   `analysis/geo_plot.py` (one sequential hue for magnitude, blue–red with gray midpoint for
   polarity, fixed categorical order).
+- Per-capita denominators come from 2020 census blocks (`analysis/population.py`: block
+  internal points summed within each geography, P.L. 94-171 POP100/HU100); the atlas
+  defaults to per 1,000 residents and leaves areas under 100 residents unshaded.
 - Areas and rates are imperial: acres and per-acre, never km² (internal `area_km2`
   fields are converted at display time, 247.105 acres per km²).
 - Copy describes associations ("correlated with"), never causes; the final year is

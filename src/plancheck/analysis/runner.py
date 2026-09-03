@@ -31,6 +31,9 @@ def run_analysis(ahj: str = "all", figures: bool = True) -> None:
                 frames[name] = out
         except Exception as exc:  # noqa: BLE001
             print(f"  {name} skipped: {exc}")
+    from plancheck.analysis.population import population_by_geography
+
+    frames.update(population_by_geography(ahj if ahj != "all" else "la_city"))
     intensity.write(frames)
     db.build()
     if not figures:

@@ -128,6 +128,10 @@ def export_geography(slug: str, ahj_slug: str, years, acs: pl.DataFrame | None) 
         if (acs is not None and layer is None)
         else {}
     )
+    pp = PARQUET_DIR / "analysis" / f"population_{slug}.parquet"
+    pop_map = (
+        {r["geo_id"]: r for r in pl.read_parquet(pp).iter_rows(named=True)} if pp.exists() else {}
+    )
     # Display names: never empty, never numeric-only, unique within the layer.
     raw_names = [r["name"] for r in ref.iter_rows(named=True)]
     counts: dict[str, int] = {}
@@ -150,6 +154,9 @@ def export_geography(slug: str, ahj_slug: str, years, acs: pl.DataFrame | None) 
             "name": name,
             "area_km2": round(r["area_km2"] if r["area_km2"] is not None else area_km2(geom), 4),
         }
+        if gid in pop_map:
+            props["pop"] = int(pop_map[gid]["pop"])
+            props["housing_units"] = int(pop_map[gid]["housing_units"])
         has_any = False
         for cls, m in by_geo.items():
             if gid in m:
@@ -182,10 +189,17 @@ def export_hex(intensity_h3: pl.DataFrame, years) -> int:
 
     by_geo = {cls: _metrics_by_geo(intensity_h3, cls, years) for cls in CLASSES}
     cells = set().union(*(m.keys() for m in by_geo.values()))
+    pp = PARQUET_DIR / "analysis" / "population_hex_r8.parquet"
+    pop_map = (
+        {r["geo_id"]: r for r in pl.read_parquet(pp).iter_rows(named=True)} if pp.exists() else {}
+    )
     feats = []
     for cell in sorted(cells):
         ring = [(round(lon, 5), round(lat, 5)) for lat, lon in h3.cell_to_boundary(cell)]
         props = {"id": cell, "name": cell, "area_km2": 0.737}
+        if cell in pop_map:
+            props["pop"] = int(pop_map[cell]["pop"])
+            props["housing_units"] = int(pop_map[cell]["housing_units"])
         for cls, m in by_geo.items():
             if cell in m:
                 props[cls] = m[cell]

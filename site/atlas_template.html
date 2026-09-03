@@ -99,7 +99,7 @@ select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px s
             <label>From <span class="yrlbl" id="yr0"></span><input id="y0" type="range"></label>
             <label>To <span class="yrlbl" id="yr1"></span><input id="y1" type="range"></label>
           </div>
-          <label class="check"><input id="perkm2" type="checkbox" checked> Per acre of land</label>
+          <label>Normalize <select id="norm"><option value="pop">Per 1,000 residents</option><option value="units">Per 1,000 housing units</option><option value="acre">Per acre of land</option><option value="none">Totals</option></select></label>
         </div>
       </div>
       <div class="panel"><h2>Legend</h2><div class="legend" id="legend"></div></div>
@@ -116,10 +116,11 @@ const RAMP = ["#cde2fb","#b7d3f6","#9ec5f4","#86b6ef","#6da7ec","#5598e7","#3987
 const DIV = ["#0d366b","#256abf","#6da7ec","#cde2fb","#eceef1","#f5b8b8","#ee8080","#e34948","#8f1f1f"];
 const CLASS_COLOR = {building:"#2a78d6", electrical:"#eb6834", mechanical:"#1baf7a", right_of_way:"#eda100"};
 const CLASS_LABEL = {building:"Building", electrical:"Electrical", mechanical:"Mechanical", right_of_way:"Right-of-way"};
-const S = {geo:"tract", cls:"building", metric:"n_permits", y0:D.years.start, y1:D.years.end, perkm2:true};
+const S = {geo:"tract", cls:"building", metric:"n_permits", y0:D.years.start, y1:D.years.end, norm:"pop"};
+const NORMS = {pop:"per 1,000 residents", units:"per 1,000 housing units", acre:"per acre", none:""};
 // Permalink: every control lives in the URL hash (#geo=tract&cls=building&metric=n_permits&y0=2013&y1=2026&per=1).
-(function restore(){ const h = new URLSearchParams(location.hash.replace(/^#/, "")); if (h.get("geo") && D.geos[h.get("geo")]) S.geo = h.get("geo"); if (h.get("cls") && CLASS_LABEL[h.get("cls")]) S.cls = h.get("cls"); if (h.get("metric") && METRICS[h.get("metric")]) S.metric = h.get("metric"); if (h.get("y0")) S.y0 = Math.max(D.years.start, Math.min(D.years.end, +h.get("y0"))); if (h.get("y1")) S.y1 = Math.max(S.y0, Math.min(D.years.end, +h.get("y1"))); if (h.get("per") != null) S.perkm2 = h.get("per") !== "0"; const v = (h.get("v") || "").split(",").map(Number); if (v.length === 3 && v.every(Number.isFinite)) S.view = v; })();
-function syncHash(){ const h = new URLSearchParams({geo:S.geo, cls:S.cls, metric:S.metric, y0:S.y0, y1:S.y1, per:S.perkm2?"1":"0"}); if (typeof map !== "undefined" && map._loaded) { const c = map.getCenter(); h.set("v", `${c.lat.toFixed(4)},${c.lng.toFixed(4)},${map.getZoom()}`); } history.replaceState(null, "", "#" + h.toString()); }
+(function restore(){ const h = new URLSearchParams(location.hash.replace(/^#/, "")); if (h.get("geo") && D.geos[h.get("geo")]) S.geo = h.get("geo"); if (h.get("cls") && CLASS_LABEL[h.get("cls")]) S.cls = h.get("cls"); if (h.get("metric") && METRICS[h.get("metric")]) S.metric = h.get("metric"); if (h.get("y0")) S.y0 = Math.max(D.years.start, Math.min(D.years.end, +h.get("y0"))); if (h.get("y1")) S.y1 = Math.max(S.y0, Math.min(D.years.end, +h.get("y1"))); if (h.get("norm") && NORMS[h.get("norm")] != null) S.norm = h.get("norm"); else if (h.get("per") != null) S.norm = h.get("per") === "0" ? "none" : "acre"; const v = (h.get("v") || "").split(",").map(Number); if (v.length === 3 && v.every(Number.isFinite)) S.view = v; })();
+function syncHash(){ const h = new URLSearchParams({geo:S.geo, cls:S.cls, metric:S.metric, y0:S.y0, y1:S.y1, norm:S.norm}); if (typeof map !== "undefined" && map._loaded) { const c = map.getCenter(); h.set("v", `${c.lat.toFixed(4)},${c.lng.toFixed(4)},${map.getZoom()}`); } history.replaceState(null, "", "#" + h.toString()); }
 function detailUrl(p){ const q = new URLSearchParams({geo:S.geo, id:p.id, cls:S.cls, metric:S.metric, y0:S.y0, y1:S.y1}); return `${DETAIL_BASE}?${q}`; }
 const FEATS = () => D.geos[S.geo].fc.features;
 const fmt = (v, m) => v==null ? "—" : (m==="valuation_sum" ? "$"+Math.round(v).toLocaleString() : Math.abs(v) < 1 ? v.toLocaleString(undefined,{maximumFractionDigits:2}) : Math.abs(v) < 10 ? v.toLocaleString(undefined,{maximumFractionDigits:1}) : Math.round(v).toLocaleString());
@@ -146,7 +147,9 @@ function value(p){
   let v = 0, any = false;
   for (let y = S.y0; y <= S.y1; y++){ const yy = c[String(y)]; if (yy && yy[S.metric]!=null){ v += yy[S.metric]; any = true; } }
   if (!any) return null;
-  if (S.perkm2 && p.area_km2 > 0) v = v / (p.area_km2 * 247.105);
+  if (S.norm === "acre") return p.area_km2 > 0 ? v / (p.area_km2 * 247.105) : null;
+  if (S.norm === "pop") return p.pop >= 100 ? v / p.pop * 1000 : null;
+  if (S.norm === "units") return p.housing_units >= 50 ? v / p.housing_units * 1000 : null;
   return v;
 }
 function areaTitle(p){
@@ -177,8 +180,9 @@ function render(){
     onEachFeature: (f, l) => {
       l.bindTooltip(() => {
         const p = f.properties, v = value(p);
-        const acs = p.acs ? `<div class="m">income ${p.acs.median_hh_income ? "$"+p.acs.median_hh_income.toLocaleString() : "—"} · renters ${p.acs.renter_share!=null ? Math.round(p.acs.renter_share*100)+"%" : "—"} · built ${p.acs.median_year_built || "—"}</div>` : "";
-        return `<b>${areaTitle(p)}</b><div>${METRICS[S.metric]}${S.perkm2 ? " per acre" : ""}, ${S.y0}–${S.y1}: <b>${fmt(v, S.metric)}</b></div>${acs}<div class="go">Click to list these permits</div>`;
+        const denom = p.pop != null ? `<div class="m">${p.pop.toLocaleString()} residents · ${(p.housing_units||0).toLocaleString()} housing units (2020)</div>` : "";
+      const acs = p.acs ? `<div class="m">income ${p.acs.median_hh_income ? "$"+p.acs.median_hh_income.toLocaleString() : "—"} · renters ${p.acs.renter_share!=null ? Math.round(p.acs.renter_share*100)+"%" : "—"} · built ${p.acs.median_year_built || "—"}</div>` : "";
+        return `<b>${areaTitle(p)}</b><div>${METRICS[S.metric]}${S.norm === "none" ? "" : " " + NORMS[S.norm]}, ${S.y0}–${S.y1}: <b>${fmt(v, S.metric)}</b></div>${denom}${acs}<div class="go">Click to list these permits</div>`;
       }, {className:"pc", sticky:true, direction:"top", opacity:1});
       l.on("mouseover", () => l.setStyle({weight:2, color:"#eda100"}));
       l.on("mouseout", () => layer.resetStyle(l));
@@ -187,11 +191,11 @@ function render(){
   }).addTo(map);
   cdLayer.addTo(map); cdLayer.bringToFront();
   const lg = document.getElementById("legend");
-  const cap = `<div class="cap">${METRICS[S.metric]}${S.perkm2 ? " per acre" : ""}, ${S.y0}–${S.y1} · ${D.geos[S.geo].label.toLowerCase()}</div>`;
+  const cap = `<div class="cap">${METRICS[S.metric]}${S.norm === "none" ? "" : " " + NORMS[S.norm]}, ${S.y0}–${S.y1} · ${D.geos[S.geo].label.toLowerCase()}</div>`;
   const rows = div
     ? DIV.map((c,i) => `<div class="row"><span class="sw" style="background:${c}"></span><span>${i===0 ? "≤ "+fmt(breaks[0]) : i===DIV.length-1 ? "≥ "+fmt(breaks[4]) : i===4 ? "0" : ""}</span></div>`)
     : RAMP.map((c,i) => `<div class="row"><span class="sw" style="background:${c}"></span><span>${i < breaks.length ? "≤ "+fmt(breaks[i], S.metric) : "> "+fmt(breaks[breaks.length-1], S.metric)}</span></div>`);
-  lg.innerHTML = cap + rows.join("") + `<div class="row"><span class="sw" style="background:transparent"></span><span>no permits</span></div>`;
+  lg.innerHTML = cap + rows.join("") + `<div class="row"><span class="sw" style="background:transparent"></span><span>${S.norm === "pop" ? "no permits or under 100 residents" : S.norm === "units" ? "no permits or under 50 housing units" : "no permits"}</span></div>`;
   syncHash();
 }
 function chart(){
@@ -217,7 +221,7 @@ function chart(){
   const leg = classes.map(c => `<span style="display:inline-flex;align-items:center;gap:6px;margin:6px 12px 0 0;font-size:12px;color:var(--ink-2)"><span style="width:14px;height:3px;background:${CLASS_COLOR[c]};display:inline-block"></span>${CLASS_LABEL[c]}</span>`).join("");
   document.getElementById("chart").innerHTML = s + leg + `<div style="font-size:11px;color:var(--ink-3);margin-top:6px">${D.years.end} is partial.</div>`;
 }
-document.getElementById("notes").innerHTML = `<p><strong>How permits were located.</strong> ${(100*D.located/D.total).toFixed(1)}% of ${D.total.toLocaleString()} records: the department's own coordinates where published, the city's BOE geometry service by reference number, then the county CAMS and city centerline locators (score ≥ 90, match type checked).</p><p>Sources: LADBS and Bureau of Engineering tables on data.lacity.org; boundaries from the LA GeoHub and maps.lacity.org; tracts and demographics from the U.S. Census Bureau (ACS 2020–2024). Dashed lines are council districts. Areas with no permits are unshaded. Click an area to list its matching permits. Net dwelling units count only permits that reached a certificate of occupancy plus finaled demolitions, by completion year; "dwelling units permitted" is the declared change on every issued permit. The URL hash carries the current view, so it can be shared as-is. School attendance areas are LAUSD's MP25 partition dissolved per level and named for the resident school; neighborhoods are the city GeoHub set.</p><p>Built with <a href="https://github.com/ssorkin/plancheck" style="color:var(--accent-ink)">plancheck</a>.</p>`;
+document.getElementById("notes").innerHTML = `<p><strong>How permits were located.</strong> ${(100*D.located/D.total).toFixed(1)}% of ${D.total.toLocaleString()} records: the department's own coordinates where published, the city's BOE geometry service by reference number, then the county CAMS and city centerline locators (score ≥ 90, match type checked).</p><p>Sources: LADBS and Bureau of Engineering tables on data.lacity.org; boundaries from the LA GeoHub and maps.lacity.org; tracts and demographics from the U.S. Census Bureau (ACS 2020–2024). Dashed lines are council districts. Areas with no permits are unshaded. Click an area to list its matching permits. Net dwelling units count only permits that reached a certificate of occupancy plus finaled demolitions, by completion year; "dwelling units permitted" is the declared change on every issued permit. Rates per 1,000 residents and per 1,000 housing units use 2020 census block counts summed within each area; areas under 100 residents (or 50 units) are left unshaded under those normalizations. The URL hash carries the current view, so it can be shared as-is. School attendance areas are LAUSD's MP25 partition dissolved per level and named for the resident school; neighborhoods are the city GeoHub set.</p><p>Built with <a href="https://github.com/ssorkin/plancheck" style="color:var(--accent-ink)">plancheck</a>.</p>`;
 
 const gs = document.getElementById("geo");
 for (const [slug, g] of Object.entries(D.geos)) { const o = document.createElement("option"); o.value = slug; o.textContent = `${g.label} (${g.fc.features.length})`; gs.appendChild(o); }
@@ -227,7 +231,7 @@ for (const id of ["y0","y1"]) { const el = document.getElementById(id); el.min =
   el.oninput = () => { S[id] = +el.value; if (S.y0 > S.y1) { if (id==="y0") S.y1 = S.y0; else S.y0 = S.y1; } document.getElementById("y0").value = S.y0; document.getElementById("y1").value = S.y1; document.getElementById("yr0").textContent = S.y0; document.getElementById("yr1").textContent = S.y1; render(); }; }
 document.getElementById("yr0").textContent = S.y0; document.getElementById("yr1").textContent = S.y1;
 for (const id of ["cls","metric"]) { const el = document.getElementById(id); el.value = S[id]; el.onchange = () => { S[id] = el.value; if (id === "cls") fillMetrics(); render(); }; }
-document.getElementById("perkm2").onchange = e => { S.perkm2 = e.target.checked; render(); };
+const ns = document.getElementById("norm"); ns.value = S.norm; ns.onchange = () => { S.norm = ns.value; render(); };
 chart(); render();
 const tb = document.getElementById("theme");
 if (tb) { const cur = () => document.documentElement.dataset.theme || "dark"; const label = () => { tb.textContent = cur() === "dark" ? "Light" : "Dark"; };
