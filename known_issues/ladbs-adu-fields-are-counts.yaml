@@ -1,0 +1,19 @@
+id: ladbs-adu-fields-are-counts
+dataset: ladbs_building_*
+years: [2013, 2026]
+kind: schema
+title: LADBS tracks ADUs and junior ADUs as separate unit counts, not as part of DU_CHANGED
+description: >
+  DU_CHANGED is the change in regular dwelling units; ADU_CHANGED and JUNIOR_ADU are
+  separate counts (values 1–11, occasionally -1). Converting a single-family house into two
+  detached ADUs is published as DU_CHANGED = -1, ADU_CHANGED = 2 (e.g. permit
+  25016-30000-16832), so summing DU_CHANGED alone shows a net loss for a project that added a
+  unit. One JUNIOR_ADU value of 373 is almost certainly a typo and is kept as published.
+evidence: >
+  Distinct ADU_CHANGED values among issued building permits since 2013: 1 (45,894), 0
+  (3,227), 2 (2,033), -1 (425), 3..11 (~300). 193 permits have DU_CHANGED < 0 with
+  ADU_CHANGED > 0. Sums since 2013: DU 167,057; ADU 52,047; JADU 4,434.
+handling: >
+  Normalized as three integer columns (dwelling_units_change, adu_units_change,
+  jadu_units_change). Net units (du_net, du_permitted) sum all three; n_adu counts permits
+  with a positive ADU or JADU change; the detail page shows the breakdown per permit.

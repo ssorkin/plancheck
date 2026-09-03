@@ -58,12 +58,14 @@ def metrics_sql(geo_col: str) -> str:
                AS n_additions,
            sum(CASE WHEN permit_type IN ({_list(cfg["demolition_types"])}) THEN 1 ELSE 0 END)::BIGINT
                AS n_demolitions,
-           sum(CASE WHEN adu_changed THEN 1 ELSE 0 END)::BIGINT AS n_adu,
+           sum(CASE WHEN coalesce(adu_units_change, 0) + coalesce(jadu_units_change, 0) > 0
+                    THEN 1 ELSE 0 END)::BIGINT AS n_adu,
            sum(CASE WHEN solar THEN 1 ELSE 0 END)::BIGINT AS n_solar,
            sum(CASE WHEN ev THEN 1 ELSE 0 END)::BIGINT AS n_ev,
            sum(valuation)::DOUBLE AS valuation_sum,
            median(valuation)::DOUBLE AS valuation_median,
-           sum(dwelling_units_change)::BIGINT AS du_permitted,
+           sum(coalesce(dwelling_units_change, 0) + coalesce(adu_units_change, 0)
+               + coalesce(jadu_units_change, 0))::BIGINT AS du_permitted,
            sum(sqft)::DOUBLE AS sqft_sum,
            sum(CASE WHEN lat IS NULL THEN 1 ELSE 0 END)::BIGINT AS n_unlocated
     FROM issued
@@ -84,7 +86,8 @@ def completions_sql() -> str:
         ) AS rn
         FROM permits p
         WHERE record_kind = 'issued' AND permit_class = 'building'
-          AND dwelling_units_change IS NOT NULL AND dwelling_units_change <> 0
+          AND coalesce(dwelling_units_change, 0) + coalesce(adu_units_change, 0)
+              + coalesce(jadu_units_change, 0) <> 0
     ),
     done AS (
         SELECT *,
@@ -103,7 +106,8 @@ def completions_sql() -> str:
 def du_net_sql(geo_col: str) -> str:
     return f"""
     SELECT ahj, {geo_col} AS geo_id, year, permit_class,
-           sum(dwelling_units_change)::BIGINT AS du_net,
+           sum(coalesce(dwelling_units_change, 0) + coalesce(adu_units_change, 0)
+               + coalesce(jadu_units_change, 0))::BIGINT AS du_net,
            count(*)::BIGINT AS n_du_completed
     FROM completions WHERE {geo_col} IS NOT NULL
     GROUP BY 1, 2, 3, 4
@@ -128,11 +132,13 @@ def compute(con: duckdb.DuckDBPyConnection | None = None) -> dict[str, pl.DataFr
     out["series_class"] = con.execute(
         "SELECT ahj, year, permit_class, count(*)::BIGINT AS n_permits, "
         "sum(valuation)::DOUBLE AS valuation_sum, "
-        "sum(dwelling_units_change)::BIGINT AS du_permitted FROM issued GROUP BY 1, 2, 3 "
+        "sum(coalesce(dwelling_units_change, 0) + coalesce(adu_units_change, 0) "
+        "+ coalesce(jadu_units_change, 0))::BIGINT AS du_permitted FROM issued GROUP BY 1, 2, 3 "
         "ORDER BY 1, 2, 3"
     ).pl()
     out["series_du_net"] = con.execute(
-        "SELECT ahj, year, sum(dwelling_units_change)::BIGINT AS du_net, count(*)::BIGINT AS n "
+        "SELECT ahj, year, sum(coalesce(dwelling_units_change, 0) + coalesce(adu_units_change, 0) "
+        "+ coalesce(jadu_units_change, 0))::BIGINT AS du_net, count(*)::BIGINT AS n "
         "FROM completions GROUP BY 1, 2 ORDER BY 1, 2"
     ).pl()
     out["series_type"] = con.execute(

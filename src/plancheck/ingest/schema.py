@@ -38,9 +38,9 @@ PERMITS_SCHEMA: dict[str, pl.DataType] = {
     "zone_src": pl.Utf8,
     "hillside": pl.Boolean,
     "valuation": pl.Float64,
-    "dwelling_units_change": pl.Int32,
-    "adu_changed": pl.Boolean,
-    "junior_adu": pl.Boolean,
+    "dwelling_units_change": pl.Int32,  # regular dwelling units (LADBS DU_CHANGED)
+    "adu_units_change": pl.Int32,  # accessory dwelling units (ADU_CHANGED, a count)
+    "jadu_units_change": pl.Int32,  # junior ADUs (JUNIOR_ADU, a count)
     "solar": pl.Boolean,
     "ev": pl.Boolean,
     "sqft": pl.Float64,

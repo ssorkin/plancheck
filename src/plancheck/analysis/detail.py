@@ -37,13 +37,16 @@ def detail_sql() -> str:
            i.permit_id, i.permit_class, i.permit_type, i.permit_subtype, i.status,
            i.issue_date, i.final_date, i.year, c.year AS completed_year,
            i.address_raw AS address, i.valuation,
-           i.dwelling_units_change AS du,
+           (coalesce(i.dwelling_units_change, 0) + coalesce(i.adu_units_change, 0)
+            + coalesce(i.jadu_units_change, 0)) AS du,
+           i.dwelling_units_change AS du_main, i.adu_units_change AS du_adu,
+           i.jadu_units_change AS du_jadu,
            left(i.work_desc, {WORK_DESC_MAX}) AS work_desc,
            round(i.lat, 5) AS lat, round(i.lon, 5) AS lon, i.source_url,
            (i.permit_type IN ({new})) AS is_new_building,
            (i.permit_type IN ({add})) AS is_addition,
            (i.permit_type IN ({demo})) AS is_demolition,
-           coalesce(i.adu_changed, false) AS is_adu,
+           (coalesce(i.adu_units_change, 0) + coalesce(i.jadu_units_change, 0) > 0) AS is_adu,
            coalesce(i.solar, false) AS is_solar,
            coalesce(i.ev, false) AS is_ev,
            (c.permit_id IS NOT NULL) AS is_completed

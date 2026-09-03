@@ -26,7 +26,8 @@ def test_ladbs_building_mapper():
     r = df.row(1, named=True)
     assert r["permit_id"] == "22016-10000-31693"
     assert r["valuation"] == 8500.0
-    assert r["adu_changed"] is True and r["hillside"] is True and r["solar"] is True
+    assert r["adu_units_change"] == 2 and r["dwelling_units_change"] == -1
+    assert r["jadu_units_change"] == 0 and r["hillside"] is True and r["solar"] is True
     assert str(r["issue_date"]) == "2023-03-17" and str(r["final_date"]) == "2024-08-15"
     assert r["tract_src"] == "191500" and r["council_district_src"] == "13"
     assert r["lat_src"] == 34.08693 and r["latlon_type_src"] == "ADDRESS"

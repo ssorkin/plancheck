@@ -123,8 +123,8 @@ def map_ladbs_building(lf: pl.LazyFrame, spec: SourceSpec) -> pl.LazyFrame:
     extras = [
         to_money("valuation").alias("valuation"),
         to_int("du_changed").alias("dwelling_units_change"),
-        to_bool("adu_changed").alias("adu_changed"),
-        to_bool("junior_adu").alias("junior_adu"),
+        to_int("adu_changed").alias("adu_units_change"),
+        to_int("junior_adu").alias("jadu_units_change"),
         to_float("square_footage").alias("sqft"),
         to_float("height").alias("height"),
         clean_text("construction").alias("construction"),

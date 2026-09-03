@@ -125,7 +125,7 @@ function syncUrl(){ const u = new URL(location.href); for (const k of ["geo","id
 // ---- data: one spatially sorted parquet + a per-geography index of row groups per area.
 const dec = new TextDecoder();
 const asStr = v => v == null ? null : (v instanceof Uint8Array ? dec.decode(v) : String(v));
-const COLUMNS = ["permit_id","permit_class","permit_type","permit_subtype","status","issue_date","final_date","year","completed_year","address","valuation","du","work_desc","lat","lon","source_url","is_new_building","is_addition","is_demolition","is_adu","is_solar","is_ev","is_completed"];
+const COLUMNS = ["permit_id","permit_class","permit_type","permit_subtype","status","issue_date","final_date","year","completed_year","address","valuation","du","du_main","du_adu","du_jadu","work_desc","lat","lon","source_url","is_new_building","is_addition","is_demolition","is_adu","is_solar","is_ev","is_completed"];
 // Byte span of one row group (all its column chunks are contiguous in the file).
 function groupSpan(md, k){ let start = Infinity, end = 0; for (const c of md.row_groups[k].columns) { const m = c.meta_data; const off = Number(m.dictionary_page_offset ?? m.data_page_offset); start = Math.min(start, off); end = Math.max(end, off + Number(m.total_compressed_size)); } return [start, end]; }
 async function loadRows(){
@@ -175,12 +175,14 @@ function apply(){
   shown = 0; document.querySelector("#tbl tbody").innerHTML = ""; document.getElementById("tbl").hidden = !VIEW.length; more();
   chart(m, yk); types(); points(); syncUrl();
 }
+const sgn = n => (n > 0 ? "+" : "") + n;
+function unitsCell(r){ if (r.du == null || r.du === 0 && !r.du_main && !r.du_adu && !r.du_jadu) return "—"; const parts = []; if (r.du_main) parts.push(`${sgn(Number(r.du_main))} unit${Math.abs(r.du_main)===1?"":"s"}`); if (r.du_adu) parts.push(`${sgn(Number(r.du_adu))} ADU`); if (r.du_jadu) parts.push(`${sgn(Number(r.du_jadu))} JADU`); return `<b>${sgn(r.du)}</b>${parts.length > 1 || (parts.length === 1 && !r.du_main) ? `<br><span style="color:var(--ink-3);font-size:11px">${parts.join(" · ")}</span>` : ""}`; }
 function more(){ const tb = document.querySelector("#tbl tbody"); const end = Math.min(shown + 200, VIEW.length);
   const frag = document.createDocumentFragment();
   for (const r of VIEW.slice(shown, end)) { const tr = document.createElement("tr");
     const link = r.source_url ? r.source_url : (r.permit_class === "right_of_way" ? null : `https://www.ladbsservices2.lacity.org/OnlineServices/PermitReport/PcisPermitDetail?id1=${encodeURIComponent(r.permit_id)}`);
     const done = r.is_completed ? ` <span class="pill done">${r.is_demolition ? "demolished" : "CofO"}</span>` : "";
-    tr.innerHTML = `<td>${r.issue_date||"—"}</td><td>${esc(r.permit_type)}${r.permit_subtype?`<br><span class="pill">${esc(r.permit_subtype)}</span>`:""}</td><td>${esc(r.address)}</td><td class="desc">${esc(r.work_desc)}</td><td class="num">${r.valuation!=null?fmt$(r.valuation):"—"}</td><td class="num">${r.du!=null?(r.du>0?"+":"")+r.du:"—"}</td><td>${esc(r.status)}${done}</td><td class="id">${link?`<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.permit_id)}</a>`:esc(r.permit_id)}</td>`;
+    tr.innerHTML = `<td>${r.issue_date||"—"}</td><td>${esc(r.permit_type)}${r.permit_subtype?`<br><span class="pill">${esc(r.permit_subtype)}</span>`:""}</td><td>${esc(r.address)}</td><td class="desc">${esc(r.work_desc)}</td><td class="num">${r.valuation!=null?fmt$(r.valuation):"—"}</td><td class="num">${unitsCell(r)}</td><td>${esc(r.status)}${done}</td><td class="id">${link?`<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.permit_id)}</a>`:esc(r.permit_id)}</td>`;
     frag.appendChild(tr); }
   tb.appendChild(frag); shown = end; document.getElementById("more").hidden = shown >= VIEW.length; document.getElementById("more").textContent = `Show more (${(VIEW.length-shown).toLocaleString()} left)`; }
 document.getElementById("more").onclick = more;
@@ -220,7 +222,7 @@ async function init(){
     ALL = await loadRows();
     apply();
   } catch (e) { document.getElementById("status").textContent = `Could not load permits: ${e.message}`; console.error(e); }
-  document.getElementById("notes").innerHTML = `<p style="margin:0 0 6px"><strong>Reading this list.</strong> Each row is one issued permit located in this area. "Units" is the permit's declared change in dwelling units; the CofO pill marks permits that reached a certificate of occupancy, "demolished" marks finaled demolitions — only those count toward net units completed.</p><p style="margin:0">Permit numbers link to the LADBS permit report or the BOE permit page. Data as of ${META.generated.slice(0,10)}.</p>`;
+  document.getElementById("notes").innerHTML = `<p style="margin:0 0 6px"><strong>Reading this list.</strong> Each row is one issued permit located in this area. "Units" is the permit's declared net change in dwelling units, counting regular units, ADUs and junior ADUs (LADBS records them separately, so converting a house into two ADUs shows as −1 unit · +2 ADU = +1); the CofO pill marks permits that reached a certificate of occupancy, "demolished" marks finaled demolitions — only those count toward net units completed.</p><p style="margin:0">Permit numbers link to the LADBS permit report or the BOE permit page. Data as of ${META.generated.slice(0,10)}.</p>`;
 }
 for (const id of ["cls","metric"]) document.getElementById(id).onchange = e => { S[id] = e.target.value; apply(); };
 for (const id of ["y0","y1"]) document.getElementById(id).onchange = e => { S[id] = +e.target.value || S[id]; if (S.y0 > S.y1) [S.y0, S.y1] = [S.y1, S.y0]; document.getElementById("y0").value=S.y0; document.getElementById("y1").value=S.y1; apply(); };
