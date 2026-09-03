@@ -9,7 +9,7 @@ class _Ahj:
 
 
 def test_boe_geometry_tier_prefers_points_then_lines(tmp_path, monkeypatch):
-    import plancheck.paths as paths
+    from plancheck import paths
 
     monkeypatch.setattr(paths, "PARQUET_DIR", tmp_path)
     d = tmp_path / "boe_geom" / "ahj=t" / "layer=01"
