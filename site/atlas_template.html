@@ -110,7 +110,13 @@ const DIV = ["#0d366b","#256abf","#6da7ec","#cde2fb","#eceef1","#f5b8b8","#ee808
 const CLASS_COLOR = {building:"#2a78d6", electrical:"#eb6834", mechanical:"#1baf7a", right_of_way:"#eda100"};
 const CLASS_LABEL = {building:"Building", electrical:"Electrical", mechanical:"Mechanical", right_of_way:"Right-of-way"};
 const S = {cls:"building", metric:"n_permits", y0:D.years.start, y1:D.years.end, perkm2:true};
-const fmt = (v, m) => v==null ? "—" : (m==="valuation_sum" ? "$"+Math.round(v).toLocaleString() : Math.round(v).toLocaleString());
+const fmt = (v, m) => v==null ? "—" : (m==="valuation_sum" ? "$"+Math.round(v).toLocaleString() : Math.abs(v) < 10 ? v.toLocaleString(undefined,{maximumFractionDigits:1}) : Math.round(v).toLocaleString());
+// Which metrics each class actually carries (e.g. new buildings and dwelling units exist only on building permits).
+const AVAIL = {};
+for (const f of D.tracts.features) for (const cls of Object.keys(CLASS_LABEL)) { const c = f.properties[cls]; if (!c) continue; const a = AVAIL[cls] || (AVAIL[cls] = new Set()); for (const yy of Object.values(c)) for (const [k, v] of Object.entries(yy)) if (v) a.add(k); }
+function fillMetrics(){ const ms = document.getElementById("metric"); ms.innerHTML = ""; const avail = AVAIL[S.cls] || new Set();
+  for (const m of Object.keys(METRICS)) { const o = document.createElement("option"); o.value = m; const ok = avail.has(m); o.textContent = METRICS[m] + (ok ? "" : " (not tracked for this class)"); o.disabled = !ok; ms.appendChild(o); }
+  if (!avail.has(S.metric)) S.metric = "n_permits"; ms.value = S.metric; }
 
 document.getElementById("st-loc").textContent = (100*D.located/D.total).toFixed(1)+"%";
 document.getElementById("st-tot").textContent = (D.total/1e6).toFixed(2)+" M";
@@ -186,12 +192,11 @@ function chart(){
 }
 document.getElementById("notes").innerHTML = `<p><strong>How permits were located.</strong> ${(100*D.located/D.total).toFixed(1)}% of ${D.total.toLocaleString()} records: the department's own coordinates where published, the city's BOE geometry service by reference number, then the county CAMS and city centerline locators (score ≥ 90, match type checked).</p><p>Sources: LADBS and Bureau of Engineering tables on data.lacity.org; boundaries from the LA GeoHub and maps.lacity.org; tracts and demographics from the U.S. Census Bureau (ACS 2020–2024). Dashed lines are council districts. Tracts with no permits are unshaded.</p><p>Built with <a href="https://github.com/ssorkin/plancheck" style="color:var(--accent-ink)">plancheck</a>.</p>`;
 
-const ms = document.getElementById("metric");
-for (const m of Object.keys(METRICS)) { const o = document.createElement("option"); o.value = m; o.textContent = METRICS[m]; ms.appendChild(o); }
+fillMetrics();
 for (const id of ["y0","y1"]) { const el = document.getElementById(id); el.min = D.years.start; el.max = D.years.end; el.value = S[id];
   el.oninput = () => { S[id] = +el.value; if (S.y0 > S.y1) { if (id==="y0") S.y1 = S.y0; else S.y0 = S.y1; } document.getElementById("y0").value = S.y0; document.getElementById("y1").value = S.y1; document.getElementById("yr0").textContent = S.y0; document.getElementById("yr1").textContent = S.y1; render(); }; }
 document.getElementById("yr0").textContent = S.y0; document.getElementById("yr1").textContent = S.y1;
-for (const id of ["cls","metric"]) { const el = document.getElementById(id); el.value = S[id]; el.onchange = () => { S[id] = el.value; render(); }; }
+for (const id of ["cls","metric"]) { const el = document.getElementById(id); el.value = S[id]; el.onchange = () => { S[id] = el.value; if (id === "cls") fillMetrics(); render(); }; }
 document.getElementById("perkm2").onchange = e => { S.perkm2 = e.target.checked; render(); };
 chart(); render();
 </script>

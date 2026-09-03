@@ -77,7 +77,7 @@ function render(){
   if (geoLayer) geoLayer.remove();
   geoLayer = L.geoJSON(fc, {
     style: f => { const v=value(f.properties); const c=colorOf(v); return {weight:0.4, color:"#ffffff", fillColor:c||"#ffffff", fillOpacity:c?0.82:0}; },
-    onEachFeature: (f, l) => { l.on("mouseover", ()=>{ const v=value(f.properties); const p=f.properties; const id=p.geoid||p.h3; const fmt = v==null?"no permits":(state.metric==="valuation_sum"? "$"+Math.round(v).toLocaleString() : v.toLocaleString(undefined,{maximumFractionDigits:1})); const acs = p.acs? `<br><span style="color:#898781">income $${(p.acs.median_hh_income||0).toLocaleString()} · renters ${Math.round((p.acs.renter_share||0)*100)}%</span>`:""; l.bindTooltip(`<b>${id}</b><br>${METRIC_LABELS[state.metric]}${state.perkm2?" per km²":""}: ${fmt}${acs}`, {className:"pc", sticky:true}).openTooltip(); }); }
+    onEachFeature: (f, l) => { l.on("mouseover", ()=>{ const v=value(f.properties); const p=f.properties; const id=p.geoid||p.h3; const fmt = v==null?"no permits":(state.metric==="valuation_sum"? "$"+Math.round(v).toLocaleString() : v.toLocaleString(undefined,{maximumFractionDigits: Math.abs(v)<10?1:0})); const acs = p.acs? `<br><span style="color:#898781">income $${(p.acs.median_hh_income||0).toLocaleString()} · renters ${Math.round((p.acs.renter_share||0)*100)}%</span>`:""; l.bindTooltip(`<b>${id}</b><br>${METRIC_LABELS[state.metric]}${state.perkm2?" per km²":""}: ${fmt}${acs}`, {className:"pc", sticky:true}).openTooltip(); }); }
   }).addTo(map);
   if (cityLayer) cityLayer.bringToFront();
   if (legend) legend.remove();
@@ -92,12 +92,15 @@ async function init(){
   const yrs = meta.config.years; state.y0 = yrs.start; state.y1 = yrs.end;
   for (const id of ["y0","y1"]) { const el=document.getElementById(id); el.min=yrs.start; el.max=yrs.end; el.value=state[id]; el.oninput=()=>{ state[id]=+el.value; if(state.y0>state.y1){ if(id==="y0") state.y1=state.y0; else state.y0=state.y1; } document.getElementById("y0").value=state.y0; document.getElementById("y1").value=state.y1; document.getElementById("yr0").textContent=state.y0; document.getElementById("yr1").textContent=state.y1; render(); }; }
   document.getElementById("yr0").textContent=state.y0; document.getElementById("yr1").textContent=state.y1;
-  const ms = document.getElementById("metric"); for (const m of meta.metrics) { const o=document.createElement("option"); o.value=m; o.textContent=METRIC_LABELS[m]||m; ms.appendChild(o); }
-  for (const id of ["layer","cls","metric"]) { const el=document.getElementById(id); el.value=state[id]; el.onchange=async()=>{ state[id]=el.value; if(!state.data[state.layer]) state.data[state.layer]=await load(state.layer); render(); }; }
+  const AVAIL = {};
+  function scanAvail(fc){ for (const f of fc.features) for (const cls of ["building","electrical","mechanical","right_of_way"]) { const c=f.properties[cls]; if(!c) continue; const a = AVAIL[cls] || (AVAIL[cls]=new Set()); for (const yy of Object.values(c)) for (const [k,v] of Object.entries(yy)) if (v) a.add(k); } }
+  function fillMetrics(){ const ms=document.getElementById("metric"); ms.innerHTML=""; const avail = AVAIL[state.cls] || new Set(); for (const m of meta.metrics) { const o=document.createElement("option"); o.value=m; const ok=avail.has(m); o.textContent=(METRIC_LABELS[m]||m)+(ok?"":" (not tracked for this class)"); o.disabled=!ok; ms.appendChild(o); } if(!avail.has(state.metric)) state.metric="n_permits"; ms.value=state.metric; }
+  for (const id of ["layer","cls","metric"]) { const el=document.getElementById(id); el.value=state[id]; el.onchange=async()=>{ state[id]=el.value; if(!state.data[state.layer]) { state.data[state.layer]=await load(state.layer); scanAvail(state.data[state.layer]); } if(id==="cls") fillMetrics(); render(); }; }
   document.getElementById("perkm2").onchange = e => { state.perkm2=e.target.checked; render(); };
   document.getElementById("note").textContent = `Data generated ${meta.generated.slice(0,10)} · issued permits only · source: LADBS & BOE via data.lacity.org`;
   try { const city = await load("city_boundary"); cityLayer = L.geoJSON(city, {style:{weight:1.2, color:"#52514e", fill:false}}).addTo(map); } catch(e) {}
   state.data.tracts = await load("tracts");
+  scanAvail(state.data.tracts); fillMetrics();
   render();
 }
 init();
