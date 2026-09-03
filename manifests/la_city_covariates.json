@@ -1,4 +1,21 @@
 {
+  "assessor.geojsonl": {
+    "dataset": "la_city_covariates",
+    "filename": "assessor.geojsonl",
+    "url": "https://services.arcgis.com/RmCCgQtiZLDCtblq/arcgis/rest/services/Parcel_Data_2021_Table/FeatureServer/0/query",
+    "sha256": "e82e875b5b5bbd13c6b46c5237b9fc3f2ff300c4d0adf9d71e1b1d5a2ee97e99",
+    "size": 361457573,
+    "downloaded_at": "2026-09-03T20:02:08+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "806127 features, layer 'Parcel_Data'",
+    "extra": {
+      "count": 806127,
+      "layer_name": "Parcel_Data",
+      "where": "RollYear='2025' AND TaxRateArea_CITY='LOS ANGELES'",
+      "out_fields": "AIN,RollYear,UseType,UseCode,UseCodeDescChar1,YearBuilt,EffectiveYearBuilt,SQFTmain,Units,Bedrooms,Bathrooms,Roll_LandValue,Roll_ImpValue,Roll_TotalValue,Roll_LandBaseYear,Roll_ImpBaseYear,SitusZIP5,CENTER_LAT,CENTER_LON"
+    }
+  },
   "hpoz.geojsonl": {
     "dataset": "la_city_covariates",
     "filename": "hpoz.geojsonl",

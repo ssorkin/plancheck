@@ -746,5 +746,56 @@
       "where": "1=1",
       "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
     }
+  },
+  "layer_63_watercourse_permits_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_63_watercourse_permits_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/63/query",
+    "sha256": "6da4b8ceab169520c167acc959282ac9fd2f16c2236d591ecdf1a86171db085e",
+    "size": 78418,
+    "downloaded_at": "2026-09-03T19:19:40+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "219 features, layer 'Watercourse Permits Points'",
+    "extra": {
+      "count": 219,
+      "layer_name": "Watercourse Permits Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_64_watercourse_permits_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_64_watercourse_permits_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/64/query",
+    "sha256": "7f76157ddf19e0ee553c98993af392e163683864bb224f8dd364fce7183baaff",
+    "size": 3779,
+    "downloaded_at": "2026-09-03T19:19:40+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "9 features, layer 'Watercourse Permits Lines'",
+    "extra": {
+      "count": 9,
+      "layer_name": "Watercourse Permits Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_65_watercourse_permits_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_65_watercourse_permits_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/65/query",
+    "sha256": "b0001ae47ba3ab2e6b880f1046a37de435734ddd31529c9198ca84127cbfa7ee",
+    "size": 1403,
+    "downloaded_at": "2026-09-03T19:19:41+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "3 features, layer 'Watercourse Permits Polygons'",
+    "extra": {
+      "count": 3,
+      "layer_name": "Watercourse Permits Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
   }
 }

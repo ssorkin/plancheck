@@ -13,7 +13,7 @@ from plancheck.paths import PARQUET_DIR
 def run_analysis(ahj: str = "all", figures: bool = True) -> None:
     from plancheck.analysis import intensity
     from plancheck.analysis.acs import tract_covariates
-    from plancheck.analysis.covariates import tract_context
+    from plancheck.analysis.covariates import assessor_by_tract, permit_parcel_join, tract_context
 
     print("aggregating …")
     frames = intensity.compute()
@@ -24,6 +24,13 @@ def run_analysis(ahj: str = "all", figures: bool = True) -> None:
         frames["tract_context"] = tract_context()
     except Exception as exc:  # noqa: BLE001
         print(f"  tract_context skipped: {exc}")
+    for name, fn in (("assessor_tract", assessor_by_tract), ("permit_parcel", permit_parcel_join)):
+        try:
+            out = fn()
+            if out is not None:
+                frames[name] = out
+        except Exception as exc:  # noqa: BLE001
+            print(f"  {name} skipped: {exc}")
     intensity.write(frames)
     db.build()
     if not figures:
@@ -172,6 +179,30 @@ def run_analysis(ahj: str = "all", figures: bool = True) -> None:
                     weight="housing_units",
                 ),
             ]
+            at = frames.get("assessor_tract")
+            if at is not None:
+                tot3 = tot.join(at, left_on="geo_id", right_on="tract_geoid")
+                outs += [
+                    F.fig_scatter_vs_covariate(
+                        tot3,
+                        "assessor_median_year_built",
+                        "adu_per_1k_units",
+                        "Assessor median year built",
+                        "ADU permits per 1,000 units",
+                        "scatter_assessor_yearbuilt_adu",
+                        weight="housing_units",
+                    ),
+                    F.fig_scatter_vs_covariate(
+                        tot3,
+                        "assessor_imp_value_per_sqft",
+                        "permits_per_1k_units",
+                        "Assessed improvement value per sq ft",
+                        "Building permits per 1,000 units",
+                        "scatter_assessor_value_permits",
+                        logx=True,
+                        weight="housing_units",
+                    ),
+                ]
             ctx = frames.get("tract_context")
             if ctx is not None and "dist_rail_median_m" in ctx.columns:
                 tot2 = tot.join(ctx, left_on="geo_id", right_on="tract_geoid")
