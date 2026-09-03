@@ -128,13 +128,26 @@ def export_geography(slug: str, ahj_slug: str, years, acs: pl.DataFrame | None) 
         if (acs is not None and layer is None)
         else {}
     )
+    # Display names: never empty, never numeric-only, unique within the layer.
+    raw_names = [r["name"] for r in ref.iter_rows(named=True)]
+    counts: dict[str, int] = {}
+    for n in raw_names:
+        if n:
+            counts[n] = counts.get(n, 0) + 1
     feats = []
     for r in ref.iter_rows(named=True):
         gid = r["id"]
         geom = from_wkb(r["wkb"])
+        name = r["name"]
+        if not name:
+            name = "Unnamed area" if gid in ("None", "") else f"Unnamed area {gid}"
+        elif name.isdigit() and layer is not None and slug != "zip":
+            name = f"Area {name}"
+        elif counts.get(name, 0) > 1 and layer is not None:
+            name = f"{name} ({gid})"
         props = {
             "id": gid,
-            "name": r["name"],
+            "name": name,
             "area_km2": round(r["area_km2"] if r["area_km2"] is not None else area_km2(geom), 4),
         }
         has_any = False

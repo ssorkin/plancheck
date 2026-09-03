@@ -77,7 +77,11 @@ function render(){
   if (geoLayer) geoLayer.remove();
   geoLayer = L.geoJSON(fc, {
     style: f => { const v=value(f.properties); const c=colorOf(v); return {weight:0.4, color:"#ffffff", fillColor:c||"#ffffff", fillOpacity:c?0.82:0}; },
-    onEachFeature: (f, l) => { l.on("mouseover", ()=>{ const v=value(f.properties); const p=f.properties; const id=p.name||p.id; const fmt = v==null?"no permits":(state.metric==="valuation_sum"? "$"+Math.round(v).toLocaleString() : v.toLocaleString(undefined,{maximumFractionDigits: Math.abs(v)<10?1:0})); const acs = p.acs? `<br><span style="color:#898781">income $${(p.acs.median_hh_income||0).toLocaleString()} · renters ${Math.round((p.acs.renter_share||0)*100)}%</span>`:""; l.bindTooltip(`<b>${id}</b><br>${METRIC_LABELS[state.metric]}${state.perkm2?" per km²":""}: ${fmt}${acs}`, {className:"pc", sticky:true}).openTooltip(); }); }
+    onEachFeature: (f, l) => {
+      l.bindTooltip(() => { const p=f.properties; const v=value(p); const id=p.name||p.id; const fmt = v==null?"no permits":(state.metric==="valuation_sum"? "$"+Math.round(v).toLocaleString() : v.toLocaleString(undefined,{maximumFractionDigits: Math.abs(v)<10?1:0})); const acs = p.acs? `<br><span style="color:#898781">income $${(p.acs.median_hh_income||0).toLocaleString()} · renters ${Math.round((p.acs.renter_share||0)*100)}%</span>`:""; return `<b>${id}</b><br>${METRIC_LABELS[state.metric]}${state.perkm2?" per km²":""}: ${fmt}${acs}`; }, {className:"pc", sticky:true});
+      l.on("mouseover", () => l.setStyle({weight:2, color:"#eda100"}));
+      l.on("mouseout", () => geoLayer.resetStyle(l));
+    }
   }).addTo(map);
   if (cityLayer) cityLayer.bringToFront();
   if (legend) legend.remove();

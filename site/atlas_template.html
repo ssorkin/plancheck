@@ -141,6 +141,14 @@ function value(p){
   if (S.perkm2 && p.area_km2 > 0) v = v / p.area_km2;
   return v;
 }
+function areaTitle(p){
+  const n = p.name || p.id;
+  if (S.geo === "tract") return `Tract ${n}`;
+  if (S.geo === "zip") return `ZIP ${n}`;
+  if (S.geo === "council_district") return `Council district ${n}`;
+  if (S.geo === "hex_r8") return `Hex ${n}`;
+  return n;
+}
 function quantiles(vals, n){ const s = vals.filter(v => v!=null && isFinite(v)).sort((a,b)=>a-b); if (!s.length) return []; return Array.from({length:n-1}, (_,i) => s[Math.floor((i+1)*s.length/n)]); }
 function render(){
   const div = S.metric === "du_net";
@@ -158,12 +166,15 @@ function render(){
   if (layer) layer.remove();
   layer = L.geoJSON(D.geos[S.geo].fc, {
     style: f => { const c = colorOf(value(f.properties)); return {weight:0.5, color:"#ffffff", opacity:0.9, fillColor: c || "#ffffff", fillOpacity: c ? 0.88 : 0}; },
-    onEachFeature: (f, l) => l.on("mouseover", () => {
-      const p = f.properties, v = value(p);
-      const acs = p.acs ? `<div class="m">income ${p.acs.median_hh_income ? "$"+p.acs.median_hh_income.toLocaleString() : "—"} · renters ${p.acs.renter_share!=null ? Math.round(p.acs.renter_share*100)+"%" : "—"} · built ${p.acs.median_year_built || "—"}</div>` : "";
-      const title = S.geo === "tract" ? `Tract ${p.name}` : S.geo === "zip" ? `ZIP ${p.name}` : S.geo === "council_district" ? `Council district ${p.name}` : p.name;
-      l.bindTooltip(`<b>${title}</b><div>${METRICS[S.metric]}${S.perkm2 ? " per km²" : ""}, ${S.y0}–${S.y1}: <b>${fmt(v, S.metric)}</b></div>${acs}`, {className:"pc", sticky:true, direction:"top"}).openTooltip();
-    })
+    onEachFeature: (f, l) => {
+      l.bindTooltip(() => {
+        const p = f.properties, v = value(p);
+        const acs = p.acs ? `<div class="m">income ${p.acs.median_hh_income ? "$"+p.acs.median_hh_income.toLocaleString() : "—"} · renters ${p.acs.renter_share!=null ? Math.round(p.acs.renter_share*100)+"%" : "—"} · built ${p.acs.median_year_built || "—"}</div>` : "";
+        return `<b>${areaTitle(p)}</b><div>${METRICS[S.metric]}${S.perkm2 ? " per km²" : ""}, ${S.y0}–${S.y1}: <b>${fmt(v, S.metric)}</b></div>${acs}`;
+      }, {className:"pc", sticky:true, direction:"top", opacity:1});
+      l.on("mouseover", () => l.setStyle({weight:2, color:"#eda100"}));
+      l.on("mouseout", () => layer.resetStyle(l));
+    }
   }).addTo(map);
   cdLayer.addTo(map); cdLayer.bringToFront();
   const lg = document.getElementById("legend");
