@@ -61,6 +61,10 @@ def ingest_acs() -> None:
         }
         data = json.load(data_path.open())
         header, body = data[0], data[1:]
+        # The API repeats NAME (once from `get=NAME`, once inside group()); keep first.
+        keep = [i for i, h in enumerate(header) if h not in header[:i]]
+        header = [header[i] for i in keep]
+        body = [[row[i] for i in keep] for row in body]
         wide = pl.DataFrame(body, schema=header, orient="row")
         id_cols = [c for c in ("NAME", "state", "county", "tract") if c in header]
         value_cols = [c for c in header if c.startswith(table) and c.endswith("E")]

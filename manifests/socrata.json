@@ -137,6 +137,52 @@
       }
     }
   },
+  "ladbs_electrical_issued_2010.csv": {
+    "dataset": "socrata",
+    "filename": "ladbs_electrical_issued_2010.csv",
+    "url": "https://data.lacity.org/api/views/yaaf-cyfa/rows.csv?accessType=DOWNLOAD",
+    "sha256": "ce8dc43ce84c168686dfd112c7a274b3bfdd19918b6b804e8c5c047d59bde34b",
+    "size": 153796524,
+    "downloaded_at": "2026-09-03T19:15:00+00:00",
+    "etag": "\"aW5kaWEuMTc2NjFfNV8yNDFDMHBQMWd6R3ZGX3BYUXR0T2pGbVA5RXZRVkE---gzirFUrVjkAg0CoQw3ZLZJSHgb2GymQ--gzip--gzip\"",
+    "last_modified": "Mon, 31 Aug 2026 13:37:43 GMT",
+    "note": "la_city ladbs_electrical_issued_2010: Building and Safety - Electrical Permits Issued Between 2010 and 2019 (N)",
+    "extra": {
+      "ahj": "la_city",
+      "source": "ladbs_electrical_issued_2010",
+      "dataset_id": "yaaf-cyfa",
+      "soda_count": 391307,
+      "soda_meta": {
+        "name": "Building and Safety - Electrical Permits Issued Between 2010 and 2019 (N)",
+        "rowsUpdatedAt": 1788183537,
+        "viewLastModified": 1717624012,
+        "attribution": "TSB"
+      }
+    }
+  },
+  "ladbs_electrical_issued_2020.csv": {
+    "dataset": "socrata",
+    "filename": "ladbs_electrical_issued_2020.csv",
+    "url": "https://data.lacity.org/api/views/ysqd-apz7/rows.csv?accessType=DOWNLOAD",
+    "sha256": "bd49b7e3b485eaf27783df5320ac2b18c1801c9f61a694291f1e8d7734376037",
+    "size": 143192053,
+    "downloaded_at": "2026-09-03T19:13:51+00:00",
+    "etag": "\"anVsaWV0dC4yOTI1XzVfMjQ1MlpmYnkzU0Z3NHNIVnRWNklrWHZZVWRYLVlZ---gzipxVK1Y5AINAqEMN2S2SUh4G9hspk--gzip--gzip\"",
+    "last_modified": "Mon, 31 Aug 2026 13:41:07 GMT",
+    "note": "la_city ladbs_electrical_issued_2020: Building and Safety - Electrical Permits Issued from 2020 to Present (N)",
+    "extra": {
+      "ahj": "la_city",
+      "source": "ladbs_electrical_issued_2020",
+      "dataset_id": "ysqd-apz7",
+      "soda_count": 357588,
+      "soda_meta": {
+        "name": "Building and Safety - Electrical Permits Issued from 2020 to Present (N)",
+        "rowsUpdatedAt": 1788183749,
+        "viewLastModified": 1717688703,
+        "attribution": "TSB"
+      }
+    }
+  },
   "ladbs_mechanical_issued_2010.csv": {
     "dataset": "socrata",
     "filename": "ladbs_mechanical_issued_2010.csv",
@@ -206,6 +252,29 @@
       }
     }
   },
+  "ladbs_mechanical_submitted_2010.csv": {
+    "dataset": "socrata",
+    "filename": "ladbs_mechanical_submitted_2010.csv",
+    "url": "https://data.lacity.org/api/views/bjvp-eqku/rows.csv?accessType=DOWNLOAD",
+    "sha256": "ceaf87dc760979a7a6404b99c1bad666d967d5bfdc74aedfcd94a39b230e3de4",
+    "size": 35414854,
+    "downloaded_at": "2026-09-03T19:12:53+00:00",
+    "etag": "\"aW5kaWEuMTc1NjRfNF8yNDBfRGJNR0psVDhNSGpqT1lnd0V0SnlGckpQMms---gzioD8U_ohioS9LRVAiNCSj2hThJDOg--gzip--gzip\"",
+    "last_modified": "Mon, 31 Aug 2026 13:45:22 GMT",
+    "note": "la_city ladbs_mechanical_submitted_2010: Building and Safety - Mechanical Permits Submitted Between 2010 and 2019 (N)",
+    "extra": {
+      "ahj": "la_city",
+      "source": "ladbs_mechanical_submitted_2010",
+      "dataset_id": "bjvp-eqku",
+      "soda_count": 89154,
+      "soda_meta": {
+        "name": "Building and Safety - Mechanical Permits Submitted Between 2010 and 2019 (N)",
+        "rowsUpdatedAt": 1788184011,
+        "viewLastModified": 1720826241,
+        "attribution": "TSB"
+      }
+    }
+  },
   "ladbs_mechanical_submitted_2020.csv": {
     "dataset": "socrata",
     "filename": "ladbs_mechanical_submitted_2020.csv",
@@ -225,6 +294,29 @@
         "name": "Building and Safety - Mechanical Permits Submitted from 2020 to Present (N)",
         "rowsUpdatedAt": 1788184191,
         "viewLastModified": 1720830864,
+        "attribution": "TSB"
+      }
+    }
+  },
+  "ladbs_mechanical_submitted_pre2010.csv": {
+    "dataset": "socrata",
+    "filename": "ladbs_mechanical_submitted_pre2010.csv",
+    "url": "https://data.lacity.org/api/views/vnau-u5ph/rows.csv?accessType=DOWNLOAD",
+    "sha256": "e010fac2a0ba201d3e67f36b777823170f52b5f3368d36eab8e573512b5bf285",
+    "size": 19867942,
+    "downloaded_at": "2026-09-03T19:13:01+00:00",
+    "etag": "\"aW5kaWEuMTc1NjJfNF8yNDExLWRIa0JXVkpDNW1rY3pQM3BQQVpCNWZkVEk---gzioD8U_ohioS9LRVAiNCSj2hThJDOg--gzip--gzip\"",
+    "last_modified": "Mon, 31 Aug 2026 13:42:59 GMT",
+    "note": "la_city ladbs_mechanical_submitted_pre2010: Building and Safety - Mechanical Permits Submitted Before 2010 (N)",
+    "extra": {
+      "ahj": "la_city",
+      "source": "ladbs_mechanical_submitted_pre2010",
+      "dataset_id": "vnau-u5ph",
+      "soda_count": 54774,
+      "soda_meta": {
+        "name": "Building and Safety - Mechanical Permits Submitted Before 2010 (N)",
+        "rowsUpdatedAt": 1788183804,
+        "viewLastModified": 1720820539,
         "attribution": "TSB"
       }
     }
