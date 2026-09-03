@@ -37,6 +37,10 @@ if [[ $build == 1 ]]; then
   mkdir -p "$site_dir/data"
   (cd "$repo_root" && uv run python scripts/build_atlas.py --standalone "$site_dir/index.html")
   cp "$repo_root"/data/export/*.geojson "$repo_root"/data/export/*.json "$site_dir/data/"
+  mkdir -p "$site_dir/data/detail" "$site_dir/vendor" "$site_dir/og"
+  cp "$repo_root"/data/export/detail/* "$site_dir/data/detail/"
+  cp "$repo_root"/site/vendor/*.mjs "$site_dir/vendor/"
+  (cd "$repo_root" && uv run python scripts/og_image.py "$site_dir/og/atlas.png")
 fi
 [[ -f "$site_dir/index.html" ]] || { echo "error: $site_dir/index.html missing" >&2; exit 1; }
 

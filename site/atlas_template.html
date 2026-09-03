@@ -68,6 +68,8 @@ select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px s
 .leaflet-tooltip.pc { background: var(--tip); color: var(--ink); border: 1px solid var(--rule-strong); border-radius: 2px; box-shadow: none; font: 12px/1.45 "IBM Plex Sans", sans-serif; padding: 6px 8px; }
 .leaflet-tooltip.pc b { font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 500; }
 .leaflet-tooltip.pc .m { color: var(--ink-2); }
+.leaflet-tooltip.pc .go { color: var(--ink-3); font-size: 11px; margin-top: 3px; }
+.leaflet-interactive { cursor: pointer; }
 .leaflet-tooltip-top.pc:before { border-top-color: var(--rule-strong); }
 @media (prefers-reduced-motion: no-preference) { .leaflet-interactive { transition: fill-opacity .15s; } }
 </style>
@@ -108,12 +110,17 @@ select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px s
 </div>
 <script>
 const D = /*__DATA__*/null;
-const METRICS = {n_permits:"Permits", n_new_building:"New buildings", n_adu:"ADU permits", n_solar:"Solar permits", valuation_sum:"Declared valuation", du_net:"Net dwelling units"};
+const METRICS = {n_permits:"Permits", n_new_building:"New buildings", n_adu:"ADU permits", n_solar:"Solar permits", valuation_sum:"Declared valuation", du_net:"Net dwelling units completed (CofO + demolitions)", du_permitted:"Dwelling units permitted"};
+const DETAIL_BASE = /*__DETAIL_BASE__*/"detail.html";
 const RAMP = ["#cde2fb","#b7d3f6","#9ec5f4","#86b6ef","#6da7ec","#5598e7","#3987e5","#2a78d6","#256abf","#1c5cab","#184f95","#104281","#0d366b"];
 const DIV = ["#0d366b","#256abf","#6da7ec","#cde2fb","#eceef1","#f5b8b8","#ee8080","#e34948","#8f1f1f"];
 const CLASS_COLOR = {building:"#2a78d6", electrical:"#eb6834", mechanical:"#1baf7a", right_of_way:"#eda100"};
 const CLASS_LABEL = {building:"Building", electrical:"Electrical", mechanical:"Mechanical", right_of_way:"Right-of-way"};
 const S = {geo:"tract", cls:"building", metric:"n_permits", y0:D.years.start, y1:D.years.end, perkm2:true};
+// Permalink: every control lives in the URL hash (#geo=tract&cls=building&metric=n_permits&y0=2013&y1=2026&per=1).
+(function restore(){ const h = new URLSearchParams(location.hash.replace(/^#/, "")); if (h.get("geo") && D.geos[h.get("geo")]) S.geo = h.get("geo"); if (h.get("cls") && CLASS_LABEL[h.get("cls")]) S.cls = h.get("cls"); if (h.get("metric") && METRICS[h.get("metric")]) S.metric = h.get("metric"); if (h.get("y0")) S.y0 = Math.max(D.years.start, Math.min(D.years.end, +h.get("y0"))); if (h.get("y1")) S.y1 = Math.max(S.y0, Math.min(D.years.end, +h.get("y1"))); if (h.get("per") != null) S.perkm2 = h.get("per") !== "0"; })();
+function syncHash(){ const h = new URLSearchParams({geo:S.geo, cls:S.cls, metric:S.metric, y0:S.y0, y1:S.y1, per:S.perkm2?"1":"0"}); history.replaceState(null, "", "#" + h.toString()); }
+function detailUrl(p){ const q = new URLSearchParams({geo:S.geo, id:p.id, cls:S.cls, metric:S.metric, y0:S.y0, y1:S.y1}); return `${DETAIL_BASE}?${q}`; }
 const FEATS = () => D.geos[S.geo].fc.features;
 const fmt = (v, m) => v==null ? "—" : (m==="valuation_sum" ? "$"+Math.round(v).toLocaleString() : Math.abs(v) < 10 ? v.toLocaleString(undefined,{maximumFractionDigits:1}) : Math.round(v).toLocaleString());
 // Which metrics each class actually carries (e.g. new buildings and dwelling units exist only on building permits).
@@ -170,10 +177,11 @@ function render(){
       l.bindTooltip(() => {
         const p = f.properties, v = value(p);
         const acs = p.acs ? `<div class="m">income ${p.acs.median_hh_income ? "$"+p.acs.median_hh_income.toLocaleString() : "—"} · renters ${p.acs.renter_share!=null ? Math.round(p.acs.renter_share*100)+"%" : "—"} · built ${p.acs.median_year_built || "—"}</div>` : "";
-        return `<b>${areaTitle(p)}</b><div>${METRICS[S.metric]}${S.perkm2 ? " per km²" : ""}, ${S.y0}–${S.y1}: <b>${fmt(v, S.metric)}</b></div>${acs}`;
+        return `<b>${areaTitle(p)}</b><div>${METRICS[S.metric]}${S.perkm2 ? " per km²" : ""}, ${S.y0}–${S.y1}: <b>${fmt(v, S.metric)}</b></div>${acs}<div class="go">Click to list these permits</div>`;
       }, {className:"pc", sticky:true, direction:"top", opacity:1});
       l.on("mouseover", () => l.setStyle({weight:2, color:"#eda100"}));
       l.on("mouseout", () => layer.resetStyle(l));
+      l.on("click", () => { const u = detailUrl(f.properties); if (DETAIL_BASE.startsWith("http")) window.open(u, "_blank", "noopener"); else location.href = u; });
     }
   }).addTo(map);
   cdLayer.addTo(map); cdLayer.bringToFront();
@@ -207,7 +215,7 @@ function chart(){
   const leg = classes.map(c => `<span style="display:inline-flex;align-items:center;gap:6px;margin:6px 12px 0 0;font-size:12px;color:var(--ink-2)"><span style="width:14px;height:3px;background:${CLASS_COLOR[c]};display:inline-block"></span>${CLASS_LABEL[c]}</span>`).join("");
   document.getElementById("chart").innerHTML = s + leg + `<div style="font-size:11px;color:var(--ink-3);margin-top:6px">${D.years.end} is partial.</div>`;
 }
-document.getElementById("notes").innerHTML = `<p><strong>How permits were located.</strong> ${(100*D.located/D.total).toFixed(1)}% of ${D.total.toLocaleString()} records: the department's own coordinates where published, the city's BOE geometry service by reference number, then the county CAMS and city centerline locators (score ≥ 90, match type checked).</p><p>Sources: LADBS and Bureau of Engineering tables on data.lacity.org; boundaries from the LA GeoHub and maps.lacity.org; tracts and demographics from the U.S. Census Bureau (ACS 2020–2024). Dashed lines are council districts. Areas with no permits are unshaded. School attendance areas are LAUSD's MP25 partition dissolved per level and named for the resident school; neighborhoods are the city GeoHub set.</p><p>Built with <a href="https://github.com/ssorkin/plancheck" style="color:var(--accent-ink)">plancheck</a>.</p>`;
+document.getElementById("notes").innerHTML = `<p><strong>How permits were located.</strong> ${(100*D.located/D.total).toFixed(1)}% of ${D.total.toLocaleString()} records: the department's own coordinates where published, the city's BOE geometry service by reference number, then the county CAMS and city centerline locators (score ≥ 90, match type checked).</p><p>Sources: LADBS and Bureau of Engineering tables on data.lacity.org; boundaries from the LA GeoHub and maps.lacity.org; tracts and demographics from the U.S. Census Bureau (ACS 2020–2024). Dashed lines are council districts. Areas with no permits are unshaded. Click an area to list its matching permits. Net dwelling units count only permits that reached a certificate of occupancy plus finaled demolitions, by completion year; "dwelling units permitted" is the declared change on every issued permit. The URL hash carries the current view, so it can be shared as-is. School attendance areas are LAUSD's MP25 partition dissolved per level and named for the resident school; neighborhoods are the city GeoHub set.</p><p>Built with <a href="https://github.com/ssorkin/plancheck" style="color:var(--accent-ink)">plancheck</a>.</p>`;
 
 const gs = document.getElementById("geo");
 for (const [slug, g] of Object.entries(D.geos)) { const o = document.createElement("option"); o.value = slug; o.textContent = `${g.label} (${g.fc.features.length})`; gs.appendChild(o); }

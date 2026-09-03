@@ -17,7 +17,12 @@ page in `site/index.html`). AHJs are pluggable: `config/sources.yaml` + `src/pla
 - Keys: `SOCRATA_APP_TOKEN` (optional) and `CENSUS_API_KEY` (required for ACS) in the
   environment or a git-ignored `.env`.
 - Site: `scripts/build_atlas.py --standalone data/site/index.html` builds the LA Permit Atlas
-  (dark by default, theme toggle); `scripts/deploy.sh [--no-build] [--no-verify]` rsyncs
+  (dark by default, theme toggle) and `detail.html`, the per-area permit list. The detail
+  page reads `data/detail/permits.parquet` (one file, sorted by H3 r9, 8,192-row groups,
+  zstd) through `index_<geo>.json` (area id → row groups) with HTTP range requests via the
+  vendored hyparquet build in `site/vendor/` — no server-side query. `analysis/detail.py`
+  writes the store; the map's URL hash is the permalink; `scripts/og_image.py` renders the
+  social card; `scripts/deploy.sh [--no-build] [--no-verify]` rsyncs
   `data/site/` to dronesclub `/var/www/plancheck-releases/<ts>/`, swaps the
   `/var/www/plancheck-current` symlink (`ln -s` + `mv -T`), prunes to 3, verifies
   https://plancheck.sorkinlabs.com (Cloudflare-proxied; nginx config in `contrib/nginx/`,
@@ -39,6 +44,11 @@ page in `site/index.html`). AHJs are pluggable: `config/sources.yaml` + `src/pla
   the bbox, and the match type agrees with the parsed kind** (intersection → `StreetInt`;
   address → `PointAddress`/`StreetAddress`/`Subaddress`). "118TH PLACE and BROADWAY AVE" →
   "118 Palace St" (score 87) is the canonical false positive this rule exists for.
+- **Net dwelling units means completed units.** `du_net` sums `dwelling_units_change` only
+  over permits that reached a certificate of occupancy (`final_date`) or demolitions with
+  status "Permit Finaled", bucketed by *completion* year (`analysis/intensity.py:
+  completions_sql`). The declared change on every issued permit is a separate metric,
+  `du_permitted`, by issue year. Never present the latter as units built.
 - **Issued only, deduplicated.** Aggregates use `record_kind='issued'` and one row per
   `(ahj, permit_id)` (latest `refresh_time`); submitted tables describe the same permits
   earlier in life. Never sum issued + submitted.

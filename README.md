@@ -31,7 +31,10 @@ than patched.
   zoning and rail proximity.
 - **Publishes** figures (`analysis/figures/`), a standalone Leaflet map (`pc export
   --inline` → `data/export/map.html`) and the [LA Permit Atlas](https://plancheck.sorkinlabs.com)
-  (`scripts/build_atlas.py`, deployed with `scripts/deploy.sh`).
+  (`scripts/build_atlas.py`, deployed with `scripts/deploy.sh`). Clicking an area on the
+  atlas lists its permits: the page reads a single spatially sorted Parquet file with HTTP
+  range requests, so the site stays static. Net dwelling units count only permits that
+  reached a certificate of occupancy plus finaled demolitions, by completion year.
 
 The AHJ (authority having jurisdiction) layer is pluggable: `config/sources.yaml` registers
 sources, geometry services, reference layers and geocoders per jurisdiction, and a small

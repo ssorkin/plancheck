@@ -63,7 +63,7 @@ def metrics_sql(geo_col: str) -> str:
            sum(CASE WHEN ev THEN 1 ELSE 0 END)::BIGINT AS n_ev,
            sum(valuation)::DOUBLE AS valuation_sum,
            median(valuation)::DOUBLE AS valuation_median,
-           sum(dwelling_units_change)::BIGINT AS du_net,
+           sum(dwelling_units_change)::BIGINT AS du_permitted,
            sum(sqft)::DOUBLE AS sqft_sum,
            sum(CASE WHEN lat IS NULL THEN 1 ELSE 0 END)::BIGINT AS n_unlocated
     FROM issued
@@ -72,21 +72,68 @@ def metrics_sql(geo_col: str) -> str:
     """
 
 
+def completions_sql() -> str:
+    """Permits whose dwelling-unit change actually happened: a certificate of occupancy was
+    issued (final_date) or a demolition was finaled. `year` is the completion year."""
+    cfg = analysis_config()
+    demo = _list(cfg["intensity"]["demolition_types"])
+    return f"""
+    WITH ranked AS (
+        SELECT p.*, row_number() OVER (
+            PARTITION BY ahj, permit_id ORDER BY refresh_time DESC NULLS LAST, source_dataset DESC
+        ) AS rn
+        FROM permits p
+        WHERE record_kind = 'issued' AND permit_class = 'building'
+          AND dwelling_units_change IS NOT NULL AND dwelling_units_change <> 0
+    ),
+    done AS (
+        SELECT *,
+               CASE WHEN final_date IS NOT NULL THEN final_date
+                    WHEN permit_type IN ({demo}) AND status = 'Permit Finaled' THEN status_date
+               END AS completed_date
+        FROM ranked WHERE rn = 1
+    )
+    SELECT * EXCLUDE (rn, year), year(completed_date)::INTEGER AS year
+    FROM done
+    WHERE completed_date IS NOT NULL
+      AND year(completed_date) BETWEEN {cfg["years"]["start"]} AND {cfg["years"]["end"]}
+    """
+
+
+def du_net_sql(geo_col: str) -> str:
+    return f"""
+    SELECT ahj, {geo_col} AS geo_id, year, permit_class,
+           sum(dwelling_units_change)::BIGINT AS du_net,
+           count(*)::BIGINT AS n_du_completed
+    FROM completions WHERE {geo_col} IS NOT NULL
+    GROUP BY 1, 2, 3, 4
+    """
+
+
 def compute(con: duckdb.DuckDBPyConnection | None = None) -> dict[str, pl.DataFrame]:
     own = con is None
     con = con or connect(read_only=True)
     con.execute(f"CREATE OR REPLACE TEMP VIEW issued AS {dedup_issued_sql()}")
+    con.execute(f"CREATE OR REPLACE TEMP VIEW completions AS {completions_sql()}")
     out: dict[str, pl.DataFrame] = {}
     for name, col in GEOGRAPHIES.items():
         try:
             df = con.execute(metrics_sql(col)).pl()
+            du = con.execute(du_net_sql(col)).pl()
         except duckdb.BinderException:
             continue  # geography column absent (layer not acquired)
+        df = df.join(du, on=["ahj", "geo_id", "year", "permit_class"], how="full", coalesce=True)
         out[f"intensity_{name}"] = df
     # Citywide series by class and by BOE subtype.
     out["series_class"] = con.execute(
-        "SELECT ahj, year, permit_class, count(*)::BIGINT AS n_permits, sum(valuation)::DOUBLE AS valuation_sum, "
-        "sum(dwelling_units_change) AS du_net FROM issued GROUP BY 1, 2, 3 ORDER BY 1, 2, 3"
+        "SELECT ahj, year, permit_class, count(*)::BIGINT AS n_permits, "
+        "sum(valuation)::DOUBLE AS valuation_sum, "
+        "sum(dwelling_units_change)::BIGINT AS du_permitted FROM issued GROUP BY 1, 2, 3 "
+        "ORDER BY 1, 2, 3"
+    ).pl()
+    out["series_du_net"] = con.execute(
+        "SELECT ahj, year, sum(dwelling_units_change)::BIGINT AS du_net, count(*)::BIGINT AS n "
+        "FROM completions GROUP BY 1, 2 ORDER BY 1, 2"
     ).pl()
     out["series_type"] = con.execute(
         "SELECT ahj, year, permit_class, permit_type, count(*) AS n_permits "

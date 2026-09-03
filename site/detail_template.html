@@ -1,0 +1,212 @@
+<title>LA Permit Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>/*__LEAFLET_CSS__*/</style>
+<style>
+:root { color-scheme: light; --ground:#f5f6f8; --sheet:#ffffff; --ink:#14181f; --ink-2:#545b67; --ink-3:#8a919c; --rule:#d9dde3; --rule-strong:#b9bfc8; --accent:#2a78d6; --accent-ink:#1c5cab; --neg:#e34948; --mid:#eceef1; --tip:#ffffff; --amber:#c98500; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; --ground:#131619; --sheet:#1a1e23; --ink:#eef0f3; --ink-2:#aab1bb; --ink-3:#737b86; --rule:#2b3139; --rule-strong:#3d444e; --accent:#3987e5; --accent-ink:#86b6ef; --neg:#e66767; --mid:#2a2f36; --tip:#22272d; --amber:#eda100; } }
+:root[data-theme="dark"] { color-scheme: dark; --ground:#131619; --sheet:#1a1e23; --ink:#eef0f3; --ink-2:#aab1bb; --ink-3:#737b86; --rule:#2b3139; --rule-strong:#3d444e; --accent:#3987e5; --accent-ink:#86b6ef; --neg:#e66767; --mid:#2a2f36; --tip:#22272d; --amber:#eda100; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--ground); color:var(--ink); font:15px/1.5 "IBM Plex Sans","Helvetica Neue",Arial,sans-serif; }
+a { color: var(--accent-ink); }
+.sheet { max-width:1320px; margin:0 auto; padding:20px 20px 40px; display:grid; gap:16px; }
+.crumbs { font: 500 12px/1 "IBM Plex Mono", ui-monospace, monospace; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); display:flex; gap:10px; align-items:center; }
+.crumbs a { color: var(--ink-2); text-decoration:none; }
+.titleblock { display:grid; grid-template-columns:1fr auto; gap:8px 24px; align-items:end; border-top:3px solid var(--ink); border-bottom:1px solid var(--rule-strong); padding:14px 0 12px; }
+.titleblock h1 { margin:0; font:700 40px/1 "Barlow Condensed","Arial Narrow",sans-serif; text-wrap:balance; }
+.titleblock .sub { color:var(--ink-2); max-width:70ch; margin:6px 0 0; }
+.stamps { display:grid; grid-template-columns:repeat(4,auto); gap:0 22px; font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12px; color:var(--ink-2); }
+.stamps b { display:block; font:600 26px/1.1 "Barlow Condensed","Arial Narrow",sans-serif; color:var(--ink); font-variant-numeric:tabular-nums; }
+.stamps span { text-transform:uppercase; letter-spacing:.08em; font-size:10.5px; color:var(--ink-3); }
+.grid { display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:16px; }
+@media (max-width: 960px) { .grid { grid-template-columns:1fr; } .titleblock { grid-template-columns:1fr; } .stamps { grid-template-columns:repeat(2,auto); } }
+.panel { background:var(--sheet); border:1px solid var(--rule); padding:14px 16px; }
+.panel h2 { margin:0 0 10px; font:600 13px/1 "IBM Plex Mono",ui-monospace,monospace; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-3); }
+.mapwrap { position:relative; height:300px; border:1px solid var(--rule); background:var(--sheet); }
+#map { position:absolute; inset:0; background:var(--sheet); }
+.status { color:var(--ink-3); font-size:13px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th, td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--rule); vertical-align:top; }
+th { font:500 11px/1.2 "IBM Plex Mono",ui-monospace,monospace; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); cursor:pointer; white-space:nowrap; user-select:none; }
+th.on { color:var(--ink); }
+td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12.5px; }
+td.desc { color:var(--ink-2); max-width:44ch; }
+td.id a { font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12px; white-space:nowrap; }
+.pill { display:inline-block; font:500 10.5px/1 "IBM Plex Mono",ui-monospace,monospace; letter-spacing:.05em; padding:3px 6px; border:1px solid var(--rule-strong); border-radius:2px; color:var(--ink-2); white-space:nowrap; }
+.pill.done { border-color:var(--accent); color:var(--accent-ink); }
+.tablewrap { overflow-x:auto; }
+.more { margin-top:10px; font:500 12px/1 "IBM Plex Mono",ui-monospace,monospace; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2); background:transparent; border:1px solid var(--rule-strong); padding:8px 12px; cursor:pointer; }
+.more:hover { color:var(--ink); }
+.chart svg { width:100%; height:auto; display:block; }
+.chart text { font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:10px; fill:var(--ink-3); }
+.chart .grid line { stroke:var(--rule); }
+.chart .axis { stroke:var(--rule-strong); }
+.filters { display:grid; gap:8px; font-size:12.5px; color:var(--ink-2); }
+select, input { font:inherit; color:var(--ink); background:var(--ground); border:1px solid var(--rule-strong); padding:6px 8px; border-radius:3px; width:100%; }
+select:focus-visible, input:focus-visible, button:focus-visible, th:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.theme { font:500 11px/1 "IBM Plex Mono",ui-monospace,monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-2); background:transparent; border:1px solid var(--rule-strong); padding:5px 9px; border-radius:2px; cursor:pointer; margin-left:auto; }
+.leaflet-control-attribution { display:none; }
+.leaflet-control-zoom a { background:var(--sheet); color:var(--ink); border-color:var(--rule-strong) !important; }
+.leaflet-tooltip.pc { background:var(--tip); color:var(--ink); border:1px solid var(--rule-strong); border-radius:2px; box-shadow:none; font:12px/1.45 "IBM Plex Sans",sans-serif; padding:6px 8px; }
+</style>
+<div class="sheet">
+  <div class="crumbs"><a href="./">LA Permit Atlas</a><span>›</span><span id="crumb-geo">…</span><button id="theme" class="theme" type="button" aria-label="Switch theme">Light</button></div>
+  <div class="titleblock">
+    <div><h1 id="title">Loading…</h1><p class="sub" id="sub"></p></div>
+    <div class="stamps">
+      <div><span>Matching permits</span><b id="st-n">—</b></div>
+      <div><span id="st-measure-label">Measure</span><b id="st-measure">—</b></div>
+      <div><span>Declared valuation</span><b id="st-val">—</b></div>
+      <div><span>Years</span><b id="st-years">—</b></div>
+    </div>
+  </div>
+  <div class="grid">
+    <div style="display:grid; gap:16px; align-content:start">
+      <div class="mapwrap"><div id="map"></div></div>
+      <div class="panel">
+        <h2 id="list-h">Permits</h2>
+        <div class="status" id="status">Fetching permits for this area…</div>
+        <div class="tablewrap"><table id="tbl" hidden><thead><tr>
+          <th data-k="issue_date" class="on">Issued</th><th data-k="permit_type">Type</th><th data-k="address">Address</th><th data-k="work_desc">Work</th><th data-k="valuation" class="num">Valuation</th><th data-k="du" class="num">Units</th><th data-k="status">Status</th><th data-k="permit_id">Permit</th>
+        </tr></thead><tbody></tbody></table></div>
+        <button id="more" class="more" hidden type="button">Show more</button>
+      </div>
+    </div>
+    <aside style="display:grid; gap:14px; align-content:start">
+      <div class="panel"><h2>Filter</h2><div class="filters">
+        <label>Permit class<select id="cls"></select></label>
+        <label>Measure<select id="metric"></select></label>
+        <label>From<input id="y0" type="number" min="1990" max="2030"></label>
+        <label>To<input id="y1" type="number" min="1990" max="2030"></label>
+        <label>Search address / description<input id="q" type="search" placeholder="e.g. ADU, pool, Vermont"></label>
+      </div></div>
+      <div class="panel chart"><h2 id="chart-h">By year</h2><div id="chart"></div></div>
+      <div class="panel"><h2>Types</h2><div id="types" style="font-size:12.5px; color:var(--ink-2)"></div></div>
+      <div class="panel" style="font-size:12.5px; color:var(--ink-2)" id="notes"></div>
+    </aside>
+  </div>
+</div>
+<script type="module">
+import { asyncBufferFromUrl, parquetReadObjects } from "./vendor/hyparquet.mjs";
+import { compressors } from "./vendor/hyparquet-compressors.mjs";
+const META = /*__META__*/null;
+const P = new URLSearchParams(location.search);
+const S = { geo: P.get("geo") || "tract", id: P.get("id") || "", cls: P.get("cls") || "building", metric: P.get("metric") || "n_permits", y0: +(P.get("y0") || META.years.start), y1: +(P.get("y1") || META.years.end), q: P.get("q") || "" };
+const CLASS_LABEL = {building:"Building", electrical:"Electrical", mechanical:"Mechanical", right_of_way:"Right-of-way (BOE)"};
+const METRICS = {
+  n_permits:      {label:"Permits", test:r=>true, sum:null},
+  n_new_building: {label:"New buildings", test:r=>r.is_new_building, sum:null},
+  n_additions:    {label:"Additions", test:r=>r.is_addition, sum:null},
+  n_demolitions:  {label:"Demolitions", test:r=>r.is_demolition, sum:null},
+  n_adu:          {label:"ADU permits", test:r=>r.is_adu, sum:null},
+  n_solar:        {label:"Solar permits", test:r=>r.is_solar, sum:null},
+  n_ev:           {label:"EV charging permits", test:r=>r.is_ev, sum:null},
+  valuation_sum:  {label:"Declared valuation", test:r=>r.valuation!=null, sum:"valuation"},
+  du_net:         {label:"Net dwelling units completed (CofO + demolitions)", test:r=>r.is_completed && r.du, sum:"du", yearKey:"completed_year"},
+  du_permitted:   {label:"Dwelling units permitted (issued)", test:r=>r.du, sum:"du"},
+};
+const fmtN = v => v==null ? "—" : Math.round(v).toLocaleString();
+const fmt$ = v => v==null ? "—" : "$" + Math.round(v).toLocaleString();
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const geoLabel = META.geographies[S.geo]?.label || S.geo;
+document.getElementById("crumb-geo").textContent = geoLabel;
+for (const [k,v] of Object.entries(CLASS_LABEL)) { const o=document.createElement("option"); o.value=k; o.textContent=v; document.getElementById("cls").appendChild(o); }
+for (const [k,v] of Object.entries(METRICS)) { const o=document.createElement("option"); o.value=k; o.textContent=v.label; document.getElementById("metric").appendChild(o); }
+document.getElementById("cls").value = S.cls; document.getElementById("metric").value = S.metric;
+document.getElementById("y0").value = S.y0; document.getElementById("y1").value = S.y1; document.getElementById("q").value = S.q;
+
+function syncUrl(){ const u = new URL(location.href); for (const k of ["geo","id","cls","metric","y0","y1","q"]) { if (S[k] !== "" && S[k] != null) u.searchParams.set(k, S[k]); else u.searchParams.delete(k); } history.replaceState(null, "", u); }
+
+// ---- data: one spatially sorted parquet + a per-geography index of row groups per area.
+const dec = new TextDecoder();
+const asStr = v => v == null ? null : (v instanceof Uint8Array ? dec.decode(v) : String(v));
+async function loadRows(){
+  const [index, dmeta] = await Promise.all([
+    (await fetch(`data/detail/index_${S.geo}.json`)).json(),
+    (await fetch(`data/detail/meta.json`)).json(),
+  ]);
+  const groups = index[S.id] || [];
+  if (!groups.length) return [];
+  const file = await asyncBufferFromUrl({ url: "data/detail/permits.parquet" });
+  const rg = dmeta.row_group, col = `g_${S.geo}`;
+  const ranges = []; for (const g of groups) { const l = ranges[ranges.length-1]; if (l && l[1] === g*rg) l[1] = (g+1)*rg; else ranges.push([g*rg, (g+1)*rg]); }
+  document.getElementById("status").textContent = `Fetching ${ranges.length} block${ranges.length>1?"s":""} of permits…`;
+  let rows = [];
+  for (const [a,b] of ranges) { const part = await parquetReadObjects({ file, rowStart:a, rowEnd:b, compressors }); rows = rows.concat(part.filter(r => asStr(r[col]) === S.id)); }
+  return rows.map(r => ({ ...r, permit_id: asStr(r.permit_id), address: asStr(r.address), work_desc: asStr(r.work_desc), permit_type: asStr(r.permit_type), permit_subtype: asStr(r.permit_subtype), status: asStr(r.status), permit_class: asStr(r.permit_class), source_url: asStr(r.source_url),
+    issue_date: r.issue_date ? new Date(r.issue_date).toISOString().slice(0,10) : null, final_date: r.final_date ? new Date(r.final_date).toISOString().slice(0,10) : null,
+    year: r.year==null?null:Number(r.year), completed_year: r.completed_year==null?null:Number(r.completed_year), valuation: r.valuation==null?null:Number(r.valuation), du: r.du==null?null:Number(r.du), lat: r.lat==null?null:Number(r.lat), lon: r.lon==null?null:Number(r.lon) }));
+}
+
+let ALL = [], VIEW = [], shown = 0, sortKey = "issue_date", sortDir = -1, map = null, pts = null;
+function apply(){
+  const m = METRICS[S.metric] || METRICS.n_permits; const yk = m.yearKey || "year"; const q = S.q.trim().toLowerCase();
+  VIEW = ALL.filter(r => r.permit_class === S.cls && m.test(r) && r[yk] != null && r[yk] >= S.y0 && r[yk] <= S.y1 && (!q || (r.address||"").toLowerCase().includes(q) || (r.work_desc||"").toLowerCase().includes(q) || (r.permit_type||"").toLowerCase().includes(q)));
+  VIEW.sort((a,b) => { const x=a[sortKey], y=b[sortKey]; if (x==null && y==null) return 0; if (x==null) return 1; if (y==null) return -1; return (x<y?-1:x>y?1:0)*sortDir; });
+  const val = VIEW.reduce((s,r)=>s+(r.valuation||0),0);
+  const measure = m.sum ? VIEW.reduce((s,r)=>s+(r[m.sum]||0),0) : VIEW.length;
+  document.getElementById("st-n").textContent = fmtN(VIEW.length);
+  document.getElementById("st-measure-label").textContent = m.label.length > 26 ? m.label.slice(0, 24) + "…" : m.label;
+  document.getElementById("st-measure").textContent = m.sum === "valuation" ? fmt$(measure) : fmtN(measure);
+  document.getElementById("st-val").textContent = fmt$(val);
+  document.getElementById("st-years").textContent = `${S.y0}–${S.y1}`;
+  document.getElementById("list-h").textContent = `${m.label} · ${CLASS_LABEL[S.cls]} · ${VIEW.length.toLocaleString()} permits`;
+  document.getElementById("status").textContent = VIEW.length ? "" : "No permits match these filters in this area.";
+  shown = 0; document.querySelector("#tbl tbody").innerHTML = ""; document.getElementById("tbl").hidden = !VIEW.length; more();
+  chart(m, yk); types(); points(); syncUrl();
+}
+function more(){ const tb = document.querySelector("#tbl tbody"); const end = Math.min(shown + 200, VIEW.length);
+  const frag = document.createDocumentFragment();
+  for (const r of VIEW.slice(shown, end)) { const tr = document.createElement("tr");
+    const link = r.source_url ? r.source_url : (r.permit_class === "right_of_way" ? null : `https://www.ladbsservices2.lacity.org/OnlineServices/PermitReport/PcisPermitDetail?id1=${encodeURIComponent(r.permit_id)}`);
+    const done = r.is_completed ? ` <span class="pill done">${r.is_demolition ? "demolished" : "CofO"}</span>` : "";
+    tr.innerHTML = `<td>${r.issue_date||"—"}</td><td>${esc(r.permit_type)}${r.permit_subtype?`<br><span class="pill">${esc(r.permit_subtype)}</span>`:""}</td><td>${esc(r.address)}</td><td class="desc">${esc(r.work_desc)}</td><td class="num">${r.valuation!=null?fmt$(r.valuation):"—"}</td><td class="num">${r.du!=null?(r.du>0?"+":"")+r.du:"—"}</td><td>${esc(r.status)}${done}</td><td class="id">${link?`<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.permit_id)}</a>`:esc(r.permit_id)}</td>`;
+    frag.appendChild(tr); }
+  tb.appendChild(frag); shown = end; document.getElementById("more").hidden = shown >= VIEW.length; document.getElementById("more").textContent = `Show more (${(VIEW.length-shown).toLocaleString()} left)`; }
+document.getElementById("more").onclick = more;
+for (const th of document.querySelectorAll("th")) { th.tabIndex = 0; const go = () => { const k = th.dataset.k; if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = k === "issue_date" || k === "valuation" || k === "du" ? -1 : 1; } document.querySelectorAll("th").forEach(t=>t.classList.toggle("on", t===th)); apply(); }; th.onclick = go; th.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } }; }
+function chart(m, yk){
+  const by = {}; for (const r of VIEW) { const y = r[yk]; by[y] = (by[y]||0) + (m.sum ? (r[m.sum]||0) : 1); }
+  const years = []; for (let y = S.y0; y <= S.y1; y++) years.push(y);
+  const vals = years.map(y => by[y]||0); const maxv = Math.max(1, ...vals.map(Math.abs));
+  const W=340, H=150, L=40, R=6, T=8, B=22, bw = (W-L-R)/years.length;
+  const yy = v => T + (1 - v/maxv) * (H-T-B) * (Math.min(...vals) < 0 ? 0.5 : 1) - (Math.min(...vals) < 0 ? 0 : 0);
+  const zero = Math.min(...vals) < 0 ? (T + (H-T-B)/2) : (H-B);
+  const sc = v => (Math.min(...vals) < 0 ? (H-T-B)/2 : (H-T-B)) * Math.abs(v)/maxv;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(m.label)} by year"><line class="axis" x1="${L}" x2="${W-R}" y1="${zero}" y2="${zero}"/>`;
+  years.forEach((y,i) => { const v = vals[i]; const h = sc(v); const x = L + i*bw + 1; const top = v >= 0 ? zero - h : zero;
+    s += `<rect x="${x}" y="${top}" width="${Math.max(1,bw-2)}" height="${h}" fill="${v<0?'var(--neg)':'var(--accent)'}"/>`;
+    if (years.length <= 14 || i % 2 === 0) s += `<text x="${x + bw/2}" y="${H-6}" text-anchor="middle">${String(y).slice(2)}</text>`; });
+  s += `<text x="${L-4}" y="${T+8}" text-anchor="end">${m.sum==="valuation"?fmt$(maxv):fmtN(maxv)}</text></svg>`;
+  document.getElementById("chart-h").textContent = `${m.label} by ${yk === "completed_year" ? "completion" : "issue"} year`;
+  document.getElementById("chart").innerHTML = s;
+}
+function types(){ const by = {}; for (const r of VIEW) by[r.permit_type] = (by[r.permit_type]||0)+1; const rows = Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  document.getElementById("types").innerHTML = rows.map(([t,n]) => `<div style="display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid var(--rule)"><span>${esc(t)}</span><span style="font-family:'IBM Plex Mono',monospace">${n.toLocaleString()}</span></div>`).join("") || "<span>—</span>"; }
+function points(){ if (!map) return; if (pts) pts.remove(); const g = VIEW.filter(r => r.lat != null);
+  pts = L.layerGroup(g.slice(0, 5000).map(r => L.circleMarker([r.lat, r.lon], {radius: 3, weight: 0, fillColor: r.du < 0 ? "#e34948" : "#eda100", fillOpacity: 0.7}).bindTooltip(`${esc(r.address)}<br>${esc(r.permit_type)} · ${r.issue_date}`, {className:"pc", direction:"top"}))).addTo(map); }
+
+async function init(){
+  document.getElementById("sub").textContent = `${geoLabel}. Issued permits ${META.years.start}–${META.years.end}; net dwelling units count only permits with a certificate of occupancy and finaled demolitions.`;
+  try {
+    // Outline of this area, from the geography export.
+    const fc = await (await fetch(`data/geo_${S.geo}.geojson`)).json();
+    const feat = fc.features.find(f => String(f.properties.id) === S.id);
+    const name = feat ? feat.properties.name : S.id;
+    document.getElementById("title").textContent = S.geo === "tract" ? `Tract ${name}` : S.geo === "zip" ? `ZIP ${name}` : S.geo === "council_district" ? `Council district ${name}` : name;
+    document.title = `${name} · LA Permit Atlas`;
+    map = L.map("map", {preferCanvas:true, attributionControl:false});
+    if (feat) { const ol = L.geoJSON(feat, {interactive:false, style:{color:"#8a919c", weight:1.5, fill:false}}).addTo(map); map.fitBounds(ol.getBounds().pad(0.1)); } else map.setView([34.05,-118.4], 10);
+    ALL = await loadRows();
+    apply();
+  } catch (e) { document.getElementById("status").textContent = `Could not load permits: ${e.message}`; console.error(e); }
+  document.getElementById("notes").innerHTML = `<p style="margin:0 0 6px"><strong>Reading this list.</strong> Each row is one issued permit located in this area. "Units" is the permit's declared change in dwelling units; the CofO pill marks permits that reached a certificate of occupancy, "demolished" marks finaled demolitions — only those count toward net units completed.</p><p style="margin:0">Permit numbers link to the LADBS permit report or the BOE permit page. Data as of ${META.generated.slice(0,10)}.</p>`;
+}
+for (const id of ["cls","metric"]) document.getElementById(id).onchange = e => { S[id] = e.target.value; apply(); };
+for (const id of ["y0","y1"]) document.getElementById(id).onchange = e => { S[id] = +e.target.value || S[id]; if (S.y0 > S.y1) [S.y0, S.y1] = [S.y1, S.y0]; document.getElementById("y0").value=S.y0; document.getElementById("y1").value=S.y1; apply(); };
+let qt; document.getElementById("q").oninput = e => { clearTimeout(qt); qt = setTimeout(() => { S.q = e.target.value; apply(); }, 200); };
+const tb = document.getElementById("theme"); const cur = () => document.documentElement.dataset.theme || "dark"; const label = () => { tb.textContent = cur() === "dark" ? "Light" : "Dark"; };
+tb.onclick = () => { const n = cur() === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = n; try { localStorage.setItem("theme", n); } catch (e) {} label(); }; label();
+init();
+</script>
