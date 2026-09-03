@@ -16,8 +16,14 @@ from shapely.geometry import shape
 from plancheck.ahj.base import AHJ
 from plancheck.paths import PARQUET_DIR, RAW_DIR
 
-GEOTYPES = {"Point": "pt", "MultiPoint": "pt", "LineString": "ln", "MultiLineString": "ln",
-            "Polygon": "pg", "MultiPolygon": "pg"}
+GEOTYPES = {
+    "Point": "pt",
+    "MultiPoint": "pt",
+    "LineString": "ln",
+    "MultiLineString": "ln",
+    "Polygon": "pg",
+    "MultiPolygon": "pg",
+}
 
 
 def _rep_point(geom) -> tuple[float, float]:
@@ -82,10 +88,18 @@ def ingest_geometries(ahj: AHJ) -> None:
             df = pl.DataFrame(
                 rows,
                 schema={
-                    "layer_id": pl.Int32, "layer": pl.Utf8, "refno": pl.Int64,
-                    "permitno": pl.Utf8, "permittype": pl.Utf8, "permitsubtype": pl.Utf8,
-                    "location": pl.Utf8, "geotype": pl.Utf8, "active": pl.Int32,
-                    "enter_date": pl.Int64, "lat": pl.Float64, "lon": pl.Float64,
+                    "layer_id": pl.Int32,
+                    "layer": pl.Utf8,
+                    "refno": pl.Int64,
+                    "permitno": pl.Utf8,
+                    "permittype": pl.Utf8,
+                    "permitsubtype": pl.Utf8,
+                    "location": pl.Utf8,
+                    "geotype": pl.Utf8,
+                    "active": pl.Int32,
+                    "enter_date": pl.Int64,
+                    "lat": pl.Float64,
+                    "lon": pl.Float64,
                     "wkb": pl.Binary,
                 },
             )

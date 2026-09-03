@@ -77,16 +77,24 @@ class SourceCoordsTier:
         lat, lon = pl.col("lat_src"), pl.col("lon_src")
         has = lat.is_not_null() & lon.is_not_null()
         zero = has & (lat == 0) & (lon == 0)
-        inside = has & (lat >= b.lat_min) & (lat <= b.lat_max) & (lon >= b.lon_min) & (
-            lon <= b.lon_max
+        inside = (
+            has & (lat >= b.lat_min) & (lat <= b.lat_max) & (lon >= b.lon_min) & (lon <= b.lon_max)
         )
-        swapped = has & ~inside & (lon >= b.lat_min) & (lon <= b.lat_max) & (
-            lat >= b.lon_min
-        ) & (lat <= b.lon_max)
+        swapped = (
+            has
+            & ~inside
+            & (lon >= b.lat_min)
+            & (lon <= b.lat_max)
+            & (lat >= b.lon_min)
+            & (lat <= b.lon_max)
+        )
         reason = (
-            pl.when(zero).then(pl.lit("zero_coords"))
-            .when(swapped).then(pl.lit("swapped_axes"))
-            .when(has & ~inside).then(pl.lit("out_of_bbox"))
+            pl.when(zero)
+            .then(pl.lit("zero_coords"))
+            .when(swapped)
+            .then(pl.lit("swapped_axes"))
+            .when(has & ~inside)
+            .then(pl.lit("out_of_bbox"))
             .otherwise(pl.lit(None, dtype=pl.Utf8))
         )
         ok = pending.filter(inside & ~zero)
@@ -189,9 +197,7 @@ class LocatorTier:
             "permit_id", "source_dataset", "geocode_reason"
         )
         return conform_results(
-            joined.filter(pl.col("_ok")).with_columns(
-                pl.lit(self.name).alias("geocode_method")
-            )
+            joined.filter(pl.col("_ok")).with_columns(pl.lit(self.name).alias("geocode_method"))
         )
 
 
@@ -223,9 +229,7 @@ def run_chain(tiers: list, permits: pl.DataFrame, ctx: Context) -> tuple[pl.Data
         unresolved.with_columns(
             pl.lit("none").alias("geocode_method"),
             pl.col("geocode_reason").fill_null("unmatched"),
-        ).join(
-            permits.select(*key_cols, "geocode_key"), on=key_cols, how="left"
-        )
+        ).join(permits.select(*key_cols, "geocode_key"), on=key_cols, how="left")
     )
     counts["none"] = unresolved.height
     out = pl.concat([*resolved, unresolved], how="vertical_relaxed") if resolved else unresolved

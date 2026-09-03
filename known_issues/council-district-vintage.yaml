@@ -1,0 +1,18 @@
+id: council-district-vintage
+dataset: la_city_reference/council_districts, ladbs CD column
+years: [2000, 2026]
+kind: vintage
+title: Council district boundaries were redrawn in 2012 and 2022; source CD fields reflect the boundaries at issue time
+description: >
+  LADBS assigns CD when a permit is processed, so historical rows carry whichever district
+  map was in force. The pipeline's spatial join uses the current boundaries from
+  maps.lacity.org (Mapping/Boundaries layer 4, which carries Effective/Revised dates).
+  The GeoHub "Council_Districts" feature service still lists pre-2022 members and is not
+  used.
+evidence: >
+  pc check reports the share of located permits whose spatially joined district differs
+  from the source's CD field, by year; expect steps around 2012 and 2022.
+handling: >
+  Both fields are kept: council_district_src (as published) and council_district (current
+  boundaries). Time series by district use the current boundaries so every year is on the
+  same map; the disagreement rate is published in DATA_QUALITY.md.

@@ -1,0 +1,53 @@
+{
+  "hpoz.geojsonl": {
+    "dataset": "la_city_covariates",
+    "filename": "hpoz.geojsonl",
+    "url": "https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Historic_Preservation_Overlay_Zones/FeatureServer/5/query",
+    "sha256": "fb7acb2e0c24263fc9de3444a4a9ab446a2f0a4afe98c693fac15b82d11d7264",
+    "size": 243694,
+    "downloaded_at": "2026-09-03T19:05:33+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "36 features, layer 'Historic Preservation Overlay Zones'",
+    "extra": {
+      "count": 36,
+      "layer_name": "Historic Preservation Overlay Zones",
+      "where": "1=1",
+      "out_fields": "*"
+    }
+  },
+  "rail_stations.geojsonl": {
+    "dataset": "la_city_covariates",
+    "filename": "rail_stations.geojsonl",
+    "url": "https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Metro_Rail_Stations_2026/FeatureServer/69/query",
+    "sha256": "054eb10c92aa1cb80d0d2e726f79817f3a1f8db8cfefba7a0d0b9f278046b5aa",
+    "size": 52762,
+    "downloaded_at": "2026-09-03T19:05:34+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "240 features, layer 'Metro_Rail_Stations_2026'",
+    "extra": {
+      "count": 240,
+      "layer_name": "Metro_Rail_Stations_2026",
+      "where": "1=1",
+      "out_fields": "*"
+    }
+  },
+  "zoning.geojsonl": {
+    "dataset": "la_city_covariates",
+    "filename": "zoning.geojsonl",
+    "url": "https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Zoning/FeatureServer/15/query",
+    "sha256": "20b456cf6b607dd21af565b71dc379ffc1b09e63e9e61c3563d06579a8e69f2b",
+    "size": 243805361,
+    "downloaded_at": "2026-09-03T19:03:32+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "58856 features, layer 'Zoning'",
+    "extra": {
+      "count": 58856,
+      "layer_name": "Zoning",
+      "where": "1=1",
+      "out_fields": "OBJECTID,Zoning,CATEGORY"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+id: boe-permitno-not-unique
+dataset: boe_permits
+years: [1987, 2026]
+kind: key
+title: BOE PermitNo is not unique; ID (type + RefNo) is the row key
+description: >
+  635,754 rows carry 597,599 distinct PermitNo values but 635,754 distinct ID values.
+  Several permit types share numbering, and a permit can be re-issued under the same number.
+evidence: >
+  SODA select count(id), count_distinct(id), count_distinct(permitno), 2026-09-03.
+handling: >
+  permit_id = ID; permit_ref = RefNo (the join key to the geometry service). Aggregates
+  count rows, i.e. permit records, not distinct PermitNo values.

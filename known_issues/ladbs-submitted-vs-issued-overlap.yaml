@@ -1,0 +1,16 @@
+id: ladbs-submitted-vs-issued-overlap
+dataset: ladbs *_submitted and *_issued families
+years: [1990, 2026]
+kind: double-counting
+title: Submitted and issued tables describe the same permits at different stages
+description: >
+  A permit that was submitted and later issued appears in both the Submitted and Issued
+  datasets (same PERMIT_NBR). Era datasets within a family can also overlap at the
+  boundaries.
+evidence: >
+  pc check (permit_id_unique) reports permit_ids present in more than one dataset of a
+  family.
+handling: >
+  Intensity aggregates use record_kind = 'issued' only and deduplicate on (ahj, permit_id)
+  keeping the latest refresh_time. Submitted rows are retained for pipeline/lead-time
+  analysis only.

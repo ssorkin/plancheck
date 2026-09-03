@@ -65,8 +65,7 @@ def ingest_acs() -> None:
         id_cols = [c for c in ("NAME", "state", "county", "tract") if c in header]
         value_cols = [c for c in header if c.startswith(table) and c.endswith("E")]
         long = (
-            wide.unpivot(index=id_cols, on=value_cols, variable_name="variable",
-                         value_name="value")
+            wide.unpivot(index=id_cols, on=value_cols, variable_name="variable", value_name="value")
             .with_columns(
                 (pl.col("state") + pl.col("county") + pl.col("tract")).alias("geoid"),
                 pl.col("value").cast(pl.Float64, strict=False),
@@ -78,7 +77,9 @@ def ingest_acs() -> None:
         )
         # The API encodes suppressed/unavailable values as large negatives.
         long = long.with_columns(
-            pl.when(pl.col("value") <= -222222222).then(None).otherwise(pl.col("value"))
+            pl.when(pl.col("value") <= -222222222)
+            .then(None)
+            .otherwise(pl.col("value"))
             .alias("value")
         )
         long.write_parquet(out / f"{t}.parquet", compression="zstd")

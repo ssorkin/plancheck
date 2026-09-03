@@ -1,4 +1,27 @@
 {
+  "ladbs_building_issued_2010.csv": {
+    "dataset": "socrata",
+    "filename": "ladbs_building_issued_2010.csv",
+    "url": "https://data.lacity.org/api/views/dyxf-7hc4/rows.csv?accessType=DOWNLOAD",
+    "sha256": "4e07687e219420d684433e30406092127ad36f7002d7993193ebe3e2f4ada6c6",
+    "size": 271355686,
+    "downloaded_at": "2026-09-03T19:03:21+00:00",
+    "etag": "\"anVsaWV0dC4zMDA3XzRfMjQwNl9ubGtnYzRZdlhJbWRxbFJuRXlnYVN4dktV---gzipRVzO-Tb8pL86VvC7F2uUDUHnxes--gzip--gzip\"",
+    "last_modified": "Mon, 31 Aug 2026 15:53:25 GMT",
+    "note": "la_city ladbs_building_issued_2010: Building and Safety - Building Permits Issued Between 2010 and 2019 (N)",
+    "extra": {
+      "ahj": "la_city",
+      "source": "ladbs_building_issued_2010",
+      "dataset_id": "dyxf-7hc4",
+      "soda_count": 533367,
+      "soda_meta": {
+        "name": "Building and Safety - Building Permits Issued Between 2010 and 2019 (N)",
+        "rowsUpdatedAt": 1788191715,
+        "viewLastModified": 1717532103,
+        "attribution": "TSB"
+      }
+    }
+  },
   "ladbs_building_issued_2020.csv": {
     "dataset": "socrata",
     "filename": "ladbs_building_issued_2020.csv",
@@ -18,6 +41,190 @@
         "name": "Building and Safety - Building Permits Issued from 2020 to Present (N)",
         "rowsUpdatedAt": 1788192880,
         "viewLastModified": 1781034746,
+        "attribution": "TSB"
+      }
+    }
+  },
+  "ladbs_building_issued_pre2010.csv": {
+    "dataset": "socrata",
+    "filename": "ladbs_building_issued_pre2010.csv",
+    "url": "https://data.lacity.org/api/views/e67z-kt2n/rows.csv?accessType=DOWNLOAD",
+    "sha256": "fdf49fbe721c21c05eae643766c4de7e40b1bc88c4f6aef5c8147cdcfad6e12c",
+    "size": 291841573,
+    "downloaded_at": "2026-09-03T19:04:26+00:00",
+    "etag": "\"anVsaWV0dC4yODc5XzdfMjUyUzBjaWd6MjVISTJYN1dBMEswaHZ6SGZsV1pZ---gzipRVzO-Tb8pL86VvC7F2uUDUHnxes--gzip--gzip\"",
+    "last_modified": "Mon, 31 Aug 2026 15:43:20 GMT",
+    "note": "la_city ladbs_building_issued_pre2010: Building and Safety - Building Permits Issued Before 2010 (N)",
+    "extra": {
+      "ahj": "la_city",
+      "source": "ladbs_building_issued_pre2010",
+      "dataset_id": "e67z-kt2n",
+      "soda_count": 639942,
+      "soda_meta": {
+        "name": "Building and Safety - Building Permits Issued Before 2010 (N)",
+        "rowsUpdatedAt": 1788191334,
+        "viewLastModified": 1721057061,
+        "attribution": "TSB"
+      }
+    }
+  },
+  "ladbs_building_submitted_2010.csv": {
+    "dataset": "socrata",
+    "filename": "ladbs_building_submitted_2010.csv",
+    "url": "https://data.lacity.org/api/views/n3xg-rixm/rows.csv?accessType=DOWNLOAD",
+    "sha256": "7874d9c8f8593500da8a947caf3c3f8f43730587940907dc6a46cc6812760bea",
+    "size": 193059650,
+    "downloaded_at": "2026-09-03T19:08:39+00:00",
+    "etag": "\"aW5kaWEuMTc2NDJfNF8yMzllRmhfYkM4WGsyM19MYmk0Zmd6dGJ3dkRHWDQ---gzio7kdyKtiosmT3hHigXa7CQfrJABQ--gzip--gzip\"",
+    "last_modified": "Mon, 31 Aug 2026 14:54:14 GMT",
+    "note": "la_city ladbs_building_submitted_2010: Building and Safety - Building Permits Submitted Between 2010 and 2019 (N)",
+    "extra": {
+      "ahj": "la_city",
+      "source": "ladbs_building_submitted_2010",
+      "dataset_id": "n3xg-rixm",
+      "soda_count": 427896,
+      "soda_meta": {
+        "name": "Building and Safety - Building Permits Submitted Between 2010 and 2019 (N)",
+        "rowsUpdatedAt": 1788189684,
+        "viewLastModified": 1720819598,
+        "attribution": "TSB"
+      }
+    }
+  },
+  "ladbs_building_submitted_2020.csv": {
+    "dataset": "socrata",
+    "filename": "ladbs_building_submitted_2020.csv",
+    "url": "https://data.lacity.org/api/views/gwh9-jnip/rows.csv?accessType=DOWNLOAD",
+    "sha256": "3cdd785cf91bce1b81a99c223e700058c0b050acc6f8b07b63c398af598582fa",
+    "size": 139370815,
+    "downloaded_at": "2026-09-03T19:05:31+00:00",
+    "etag": "\"anVsaWV0dC4zMDA2XzRfMjQwc3VDdE5jWHdXLTVVbVJNNjlIc1VMWXJ4OXlZ---gzipO5HcirYqLJk94R4oF2uwkH6yQAU--gzip--gzip\"",
+    "last_modified": "Mon, 31 Aug 2026 15:24:38 GMT",
+    "note": "la_city ladbs_building_submitted_2020: Building and Safety - Building Permits Submitted from 2020 to Present (N)",
+    "extra": {
+      "ahj": "la_city",
+      "source": "ladbs_building_submitted_2020",
+      "dataset_id": "gwh9-jnip",
+      "soda_count": 303617,
+      "soda_meta": {
+        "name": "Building and Safety - Building Permits Submitted from 2020 to Present (N)",
+        "rowsUpdatedAt": 1788190794,
+        "viewLastModified": 1770650272,
+        "attribution": "TSB"
+      }
+    }
+  },
+  "ladbs_building_submitted_pre2010.csv": {
+    "dataset": "socrata",
+    "filename": "ladbs_building_submitted_pre2010.csv",
+    "url": "https://data.lacity.org/api/views/b6ii-mhed/rows.csv?accessType=DOWNLOAD",
+    "sha256": "89fc41a63dc9d1ad190873b3654d176855c0fbd10fadeab64bb293320be849b0",
+    "size": 149568072,
+    "downloaded_at": "2026-09-03T19:09:20+00:00",
+    "etag": "\"aW5kaWEuMTc2NDBfNF8yMzlVVWs5Znp2VkVDVlVJdXQxc0NDc185NXFQdE0---gzio7kdyKtiosmT3hHigXa7CQfrJABQ--gzip--gzip\"",
+    "last_modified": "Mon, 31 Aug 2026 14:51:52 GMT",
+    "note": "la_city ladbs_building_submitted_pre2010: Building and Safety - Building Permits Submitted Before 2010 (N)",
+    "extra": {
+      "ahj": "la_city",
+      "source": "ladbs_building_submitted_pre2010",
+      "dataset_id": "b6ii-mhed",
+      "soda_count": 342322,
+      "soda_meta": {
+        "name": "Building and Safety - Building Permits Submitted Before 2010 (N)",
+        "rowsUpdatedAt": 1788187946,
+        "viewLastModified": 1720819146,
+        "attribution": "TSB"
+      }
+    }
+  },
+  "ladbs_mechanical_issued_2010.csv": {
+    "dataset": "socrata",
+    "filename": "ladbs_mechanical_issued_2010.csv",
+    "url": "https://data.lacity.org/api/views/5m3t-xjex/rows.csv?accessType=DOWNLOAD",
+    "sha256": "4fdd619fe4ac9d94d2f221978598e216d51f46cfdfde09aa117cb8501211234a",
+    "size": 183215953,
+    "downloaded_at": "2026-09-03T19:11:11+00:00",
+    "etag": "\"aW5kaWEuMTc1MjlfNV8yNDc5WV9kMkZJNE1GaUVZdjdDNkJHUU1PdkFodjQ---gzirFUrVjkAg0CoQw3ZLZJSHgb2GymQ--gzip--gzip\"",
+    "last_modified": "Mon, 31 Aug 2026 14:25:52 GMT",
+    "note": "la_city ladbs_mechanical_issued_2010: Building and Safety - Mechanical Permits Issued Between 2010 and 2019 (N)",
+    "extra": {
+      "ahj": "la_city",
+      "source": "ladbs_mechanical_issued_2010",
+      "dataset_id": "5m3t-xjex",
+      "soda_count": 503281,
+      "soda_meta": {
+        "name": "Building and Safety - Mechanical Permits Issued Between 2010 and 2019 (N)",
+        "rowsUpdatedAt": 1788187097,
+        "viewLastModified": 1717699446,
+        "attribution": "TSB"
+      }
+    }
+  },
+  "ladbs_mechanical_issued_2020.csv": {
+    "dataset": "socrata",
+    "filename": "ladbs_mechanical_issued_2020.csv",
+    "url": "https://data.lacity.org/api/views/67is-svtd/rows.csv?accessType=DOWNLOAD",
+    "sha256": "1e1b145d7651b7d912286d7ba1ec59cf332263f82a00f48568edc2ac68948467",
+    "size": 108558584,
+    "downloaded_at": "2026-09-03T19:09:45+00:00",
+    "etag": "\"anVsaWV0dC4yODc4XzZfMjc1QzhwVjY2dkZBZ0VEXzhtR1Z2YTB6RGZiNWo4---gzipxVK1Y5AINAqEMN2S2SUh4G9hspk--gzip--gzip\"",
+    "last_modified": "Mon, 31 Aug 2026 14:43:31 GMT",
+    "note": "la_city ladbs_mechanical_issued_2020: Building and Safety - Mechanical Permits Issued from 2020 to Present (N)",
+    "extra": {
+      "ahj": "la_city",
+      "source": "ladbs_mechanical_issued_2020",
+      "dataset_id": "67is-svtd",
+      "soda_count": 295432,
+      "soda_meta": {
+        "name": "Building and Safety - Mechanical Permits Issued from 2020 to Present (N)",
+        "rowsUpdatedAt": 1788187824,
+        "viewLastModified": 1717706144,
+        "attribution": "TSB"
+      }
+    }
+  },
+  "ladbs_mechanical_issued_pre2010.csv": {
+    "dataset": "socrata",
+    "filename": "ladbs_mechanical_issued_pre2010.csv",
+    "url": "https://data.lacity.org/api/views/mcip-sa6g/rows.csv?accessType=DOWNLOAD",
+    "sha256": "e7b2ccf25f12d17c756e942464ee59621373fd33842c3cf9288f6116ce70a391",
+    "size": 198264017,
+    "downloaded_at": "2026-09-03T19:12:16+00:00",
+    "etag": "\"anVsaWV0dC4yODc3XzdfMjcwNk01ZnlvLWNMTTRYZ1NIMDJBOC1wQzNMTWkw---gzipxVK1Y5AINAqEMN2S2SUh4G9hspk--gzip--gzip\"",
+    "last_modified": "Mon, 31 Aug 2026 13:57:58 GMT",
+    "note": "la_city ladbs_mechanical_issued_pre2010: Building and Safety - Mechanical Permits Issued Before 2010 (N)",
+    "extra": {
+      "ahj": "la_city",
+      "source": "ladbs_mechanical_issued_pre2010",
+      "dataset_id": "mcip-sa6g",
+      "soda_count": 583619,
+      "soda_meta": {
+        "name": "Building and Safety - Mechanical Permits Issued Before 2010 (N)",
+        "rowsUpdatedAt": 1788186205,
+        "viewLastModified": 1717694642,
+        "attribution": "TSB"
+      }
+    }
+  },
+  "ladbs_mechanical_submitted_2020.csv": {
+    "dataset": "socrata",
+    "filename": "ladbs_mechanical_submitted_2020.csv",
+    "url": "https://data.lacity.org/api/views/9rag-xmmd/rows.csv?accessType=DOWNLOAD",
+    "sha256": "be326d266f331e07893d05d3f36b27e915ee980752bbef86c41325dba9d2997b",
+    "size": 24464528,
+    "downloaded_at": "2026-09-03T19:12:24+00:00",
+    "etag": "\"aW5kaWEuMTc1NjNfNV8yNDRHaWxMOEZIcXZVUWNQVFZRWW5SY3MtSnU2ejg---gzioD8U_ohioS9LRVAiNCSj2hThJDOg--gzip--gzip\"",
+    "last_modified": "Mon, 31 Aug 2026 13:47:20 GMT",
+    "note": "la_city ladbs_mechanical_submitted_2020: Building and Safety - Mechanical Permits Submitted from 2020 to Present (N)",
+    "extra": {
+      "ahj": "la_city",
+      "source": "ladbs_mechanical_submitted_2020",
+      "dataset_id": "9rag-xmmd",
+      "soda_count": 64662,
+      "soda_meta": {
+        "name": "Building and Safety - Mechanical Permits Submitted from 2020 to Present (N)",
+        "rowsUpdatedAt": 1788184191,
+        "viewLastModified": 1720830864,
         "attribution": "TSB"
       }
     }

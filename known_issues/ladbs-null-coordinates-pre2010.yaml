@@ -1,0 +1,17 @@
+id: ladbs-null-coordinates-pre2010
+dataset: ladbs_building_issued_pre2010, ladbs_mechanical_issued_pre2010, ladbs_electrical_issued_pre2010
+years: [1990, 2009]
+kind: coverage-gap
+title: Pre-2010 LADBS permits lack coordinates on roughly 3–5% of rows
+description: >
+  The LADBS exports carry LAT/LON assigned by the department (TYPE_LAT_LON = ADDRESS,
+  BUILDING or PIN). For permits issued before 2010 about 3.4% of building rows (21,889 of
+  639,942) and 4.8% of mechanical rows (28,281 of 583,619) have no coordinates, versus
+  0.15% for 2020-present. Older address strings are also less standardized.
+evidence: >
+  SODA count(*) WHERE lat IS NULL on e67z-kt2n and mcip-sa6g, 2026-09-03.
+handling: >
+  Rows without source coordinates fall through the geocode chain (CAMS then the city
+  centerline locator) using PRIMARY_ADDRESS + ZIP_CODE; the resulting geocode_method and
+  score travel with the row, and pc check reports coverage by source and year. Nothing is
+  imputed; unlocated permits are counted as n_unlocated in every aggregate.

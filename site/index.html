@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>plancheck — Los Angeles permit activity</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<style>
+  :root { --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781; --grid:#e1e0d9; --blue:#2a78d6; }
+  html, body { margin:0; height:100%; background:var(--surface); color:var(--ink); font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+  #app { display:grid; grid-template-rows:auto 1fr; height:100%; }
+  header { display:flex; flex-wrap:wrap; gap:.75rem 1.25rem; align-items:center; padding:.6rem 1rem; border-bottom:1px solid var(--grid); }
+  header h1 { font-size:1rem; margin:0 .5rem 0 0; font-weight:600; }
+  label { color:var(--ink2); font-size:.85rem; display:flex; gap:.35rem; align-items:center; }
+  select, input[type=range] { font:inherit; }
+  #map { width:100%; height:100%; }
+  .legend { background:rgba(252,252,251,.94); padding:.5rem .7rem; border:1px solid var(--grid); border-radius:4px; font-size:.8rem; color:var(--ink2); line-height:1.6; }
+  .legend .sw { display:inline-block; width:14px; height:12px; margin-right:6px; vertical-align:-2px; }
+  .leaflet-tooltip.pc { font-size:.8rem; color:var(--ink); }
+  .note { color:var(--muted); font-size:.78rem; margin-left:auto; }
+  a { color:var(--blue); }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>plancheck · Los Angeles permits</h1>
+    <label>Layer <select id="layer"><option value="tracts">Census tracts</option><option value="hex_r8">Hex cells (H3 r8)</option></select></label>
+    <label>Class <select id="cls"><option value="building">Building</option><option value="electrical">Electrical</option><option value="mechanical">Mechanical</option><option value="right_of_way">Right-of-way (BOE)</option></select></label>
+    <label>Metric <select id="metric"></select></label>
+    <label>Years <span id="yr0"></span>–<span id="yr1"></span> <input id="y0" type="range"> <input id="y1" type="range"></label>
+    <label><input id="perkm2" type="checkbox" checked> per km²</label>
+    <span class="note" id="note"></span>
+  </header>
+  <div id="map"></div>
+</div>
+<script>
+const INLINE = /*__INLINE_DATA__*/null;
+const METRIC_LABELS = {n_permits:"Permits", n_new_building:"New buildings", n_additions:"Additions", n_demolitions:"Demolitions", n_adu:"ADU permits", n_solar:"Solar", n_ev:"EV charging", valuation_sum:"Declared valuation ($)", du_net:"Net dwelling units"};
+const RAMP = ["#cde2fb","#b7d3f6","#9ec5f4","#86b6ef","#6da7ec","#5598e7","#3987e5","#2a78d6","#256abf","#1c5cab","#184f95","#104281","#0d366b"];
+const DIV = ["#0d366b","#256abf","#6da7ec","#cde2fb","#f0efec","#f5b8b8","#ee8080","#e34948","#8f1f1f"];
+const state = {layer:"tracts", cls:"building", metric:"n_permits", y0:2013, y1:2026, perkm2:true, data:{}};
+const map = L.map("map", {preferCanvas:true}).setView([34.05,-118.4], 10);
+L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png", {attribution:"&copy; OpenStreetMap &copy; CARTO", subdomains:"abcd", maxZoom:19}).addTo(map);
+L.tileLayer("https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png", {subdomains:"abcd", maxZoom:19, pane:"shadowPane"}).addTo(map);
+let geoLayer = null, cityLayer = null, legend = null;
+
+async function load(name){
+  if (INLINE && INLINE[name]) return INLINE[name];
+  const r = await fetch(`../data/export/${name}.geojson`.replace("meta.geojson","meta.json").replace("series.geojson","series.json"));
+  return r.json();
+}
+function value(props){
+  const c = props[state.cls]; if(!c) return null;
+  let v = 0, any=false;
+  for (let y=state.y0; y<=state.y1; y++){ const yy=c[String(y)]; if(yy && yy[state.metric]!=null){ v+=yy[state.metric]; any=true; } }
+  if(!any) return null;
+  if(state.perkm2 && state.layer==="tracts" && props.arealand_km2>0) v = v/props.arealand_km2;
+  if(state.perkm2 && state.layer==="hex_r8") v = v/0.737;
+  return v;
+}
+function quantiles(vals, n){ const s=[...vals].filter(v=>v!=null && isFinite(v)).sort((a,b)=>a-b); if(!s.length) return []; return Array.from({length:n-1},(_,i)=>s[Math.floor((i+1)*s.length/n)]); }
+function render(){
+  const fc = state.data[state.layer]; if(!fc) return;
+  const diverging = state.metric==="du_net";
+  const vals = fc.features.map(f=>value(f.properties));
+  let breaks, colorOf;
+  if (diverging){
+    const lim = quantiles(vals.map(v=>v==null?null:Math.abs(v)), 50)[47] || 1;
+    colorOf = v => { if(v==null) return null; const t=Math.max(-1,Math.min(1,v/lim)); return DIV[Math.round((t+1)/2*(DIV.length-1))]; };
+    breaks = [-lim, -lim/2, 0, lim/2, lim];
+  } else {
+    breaks = quantiles(vals, RAMP.length);
+    colorOf = v => { if(v==null) return null; let i=0; while(i<breaks.length && v>breaks[i]) i++; return RAMP[Math.min(i, RAMP.length-1)]; };
+  }
+  if (geoLayer) geoLayer.remove();
+  geoLayer = L.geoJSON(fc, {
+    style: f => { const v=value(f.properties); const c=colorOf(v); return {weight:0.4, color:"#ffffff", fillColor:c||"#ffffff", fillOpacity:c?0.82:0}; },
+    onEachFeature: (f, l) => { l.on("mouseover", ()=>{ const v=value(f.properties); const p=f.properties; const id=p.geoid||p.h3; const fmt = v==null?"no permits":(state.metric==="valuation_sum"? "$"+Math.round(v).toLocaleString() : v.toLocaleString(undefined,{maximumFractionDigits:1})); const acs = p.acs? `<br><span style="color:#898781">income $${(p.acs.median_hh_income||0).toLocaleString()} · renters ${Math.round((p.acs.renter_share||0)*100)}%</span>`:""; l.bindTooltip(`<b>${id}</b><br>${METRIC_LABELS[state.metric]}${state.perkm2?" per km²":""}: ${fmt}${acs}`, {className:"pc", sticky:true}).openTooltip(); }); }
+  }).addTo(map);
+  if (cityLayer) cityLayer.bringToFront();
+  if (legend) legend.remove();
+  legend = L.control({position:"bottomright"});
+  legend.onAdd = () => { const d=L.DomUtil.create("div","legend"); const fmt=x=>state.metric==="valuation_sum"?"$"+Math.round(x).toLocaleString():x.toLocaleString(undefined,{maximumFractionDigits:1});
+    d.innerHTML = `<b>${METRIC_LABELS[state.metric]}</b>${state.perkm2?" per km²":""}, ${state.y0}–${state.y1}<br>` + (diverging? DIV.map((c,i)=>`<span class="sw" style="background:${c}"></span>${i===0?"≤ "+fmt(breaks[0]):i===DIV.length-1?"≥ "+fmt(breaks[4]):i===4?"0":""}<br>`).join("") : RAMP.map((c,i)=>`<span class="sw" style="background:${c}"></span>${i<breaks.length? "≤ "+fmt(breaks[i]) : "> "+fmt(breaks[breaks.length-1])}<br>`).join(""));
+    return d; };
+  legend.addTo(map);
+}
+async function init(){
+  const meta = INLINE ? INLINE.meta : await (await fetch("../data/export/meta.json")).json();
+  const yrs = meta.config.years; state.y0 = yrs.start; state.y1 = yrs.end;
+  for (const id of ["y0","y1"]) { const el=document.getElementById(id); el.min=yrs.start; el.max=yrs.end; el.value=state[id]; el.oninput=()=>{ state[id]=+el.value; if(state.y0>state.y1){ if(id==="y0") state.y1=state.y0; else state.y0=state.y1; } document.getElementById("y0").value=state.y0; document.getElementById("y1").value=state.y1; document.getElementById("yr0").textContent=state.y0; document.getElementById("yr1").textContent=state.y1; render(); }; }
+  document.getElementById("yr0").textContent=state.y0; document.getElementById("yr1").textContent=state.y1;
+  const ms = document.getElementById("metric"); for (const m of meta.metrics) { const o=document.createElement("option"); o.value=m; o.textContent=METRIC_LABELS[m]||m; ms.appendChild(o); }
+  for (const id of ["layer","cls","metric"]) { const el=document.getElementById(id); el.value=state[id]; el.onchange=async()=>{ state[id]=el.value; if(!state.data[state.layer]) state.data[state.layer]=await load(state.layer); render(); }; }
+  document.getElementById("perkm2").onchange = e => { state.perkm2=e.target.checked; render(); };
+  document.getElementById("note").textContent = `Data generated ${meta.generated.slice(0,10)} · issued permits only · source: LADBS & BOE via data.lacity.org`;
+  try { const city = await load("city_boundary"); cityLayer = L.geoJSON(city, {style:{weight:1.2, color:"#52514e", fill:false}}).addTo(map); } catch(e) {}
+  state.data.tracts = await load("tracts");
+  render();
+}
+init();
+</script>
+</body>
+</html>

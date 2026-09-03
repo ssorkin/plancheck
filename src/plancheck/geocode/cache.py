@@ -15,9 +15,15 @@ from plancheck.geocode.base import GeocodeResult
 from plancheck.paths import PARQUET_DIR
 
 SCHEMA = {
-    "key": pl.Utf8, "geocoder": pl.Utf8, "status": pl.Utf8, "lat": pl.Float64,
-    "lon": pl.Float64, "score": pl.Float64, "match_type": pl.Utf8,
-    "matched_address": pl.Utf8, "geocoded_at": pl.Utf8,
+    "key": pl.Utf8,
+    "geocoder": pl.Utf8,
+    "status": pl.Utf8,
+    "lat": pl.Float64,
+    "lon": pl.Float64,
+    "score": pl.Float64,
+    "match_type": pl.Utf8,
+    "matched_address": pl.Utf8,
+    "geocoded_at": pl.Utf8,
 }
 
 

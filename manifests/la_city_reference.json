@@ -1,0 +1,70 @@
+{
+  "city_boundary.geojsonl": {
+    "dataset": "la_city_reference",
+    "filename": "city_boundary.geojsonl",
+    "url": "https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/City_Boundary_of_Los_Angeles/FeatureServer/0/query",
+    "sha256": "9cb1b8d36aeb1ee7961b81380d8f59a2a960efc36b6f705f0a3ba6e4e0e314a1",
+    "size": 211404,
+    "downloaded_at": "2026-09-03T19:02:25+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "1 features, layer 'City_Boundary_of_Los_Angeles'",
+    "extra": {
+      "count": 1,
+      "layer_name": "City_Boundary_of_Los_Angeles",
+      "where": "1=1",
+      "out_fields": "objectid,city"
+    }
+  },
+  "community_plan_areas.geojsonl": {
+    "dataset": "la_city_reference",
+    "filename": "community_plan_areas.geojsonl",
+    "url": "https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Community_Plan_Areas/FeatureServer/0/query",
+    "sha256": "f3d5dbbdd43dbac7824d402a114eac55851a773a1341ba219243f8fa6f0d4bcb",
+    "size": 1289262,
+    "downloaded_at": "2026-09-03T19:02:24+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "36 features, layer 'Community Plan Areas'",
+    "extra": {
+      "count": 36,
+      "layer_name": "Community Plan Areas",
+      "where": "1=1",
+      "out_fields": "OBJECTID,CPA_NUM,NAME_ALF"
+    }
+  },
+  "council_districts.geojsonl": {
+    "dataset": "la_city_reference",
+    "filename": "council_districts.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Mapping/Boundaries/MapServer/4/query",
+    "sha256": "93219cd6a67b9ead446c8adf0c6be099f3e6b85108703509dc8c10a5adcaccbd",
+    "size": 784592,
+    "downloaded_at": "2026-09-03T19:02:23+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "15 features, layer 'Council Districts'",
+    "extra": {
+      "count": 15,
+      "layer_name": "Council Districts",
+      "where": "1=1",
+      "out_fields": "OBJECTID,NAME,District,District_Name,Effective,Revised"
+    }
+  },
+  "neighborhood_councils.geojsonl": {
+    "dataset": "la_city_reference",
+    "filename": "neighborhood_councils.geojsonl",
+    "url": "https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Neighborhood_Council_Boundaries_(2018)/FeatureServer/0/query",
+    "sha256": "23b0c29366a72693d221aab0807704037b3c5a32cbf30af841be786c075edfae",
+    "size": 282624,
+    "downloaded_at": "2026-09-03T19:02:24+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "99 features, layer 'Neighborhood_Council_Boundaries_(2018)'",
+    "extra": {
+      "count": 99,
+      "layer_name": "Neighborhood_Council_Boundaries_(2018)",
+      "where": "1=1",
+      "out_fields": "FID,Name"
+    }
+  }
+}

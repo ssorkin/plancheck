@@ -1,0 +1,750 @@
+{
+  "layer_02_above_ground_facilities_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_02_above_ground_facilities_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/2/query",
+    "sha256": "59703f6f2a208aa27ee5ecb1b801ffe83e239e230c00065d55c7af593ae164fc",
+    "size": 880114,
+    "downloaded_at": "2026-09-03T19:02:28+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "2384 features, layer 'Above Ground Facilities Points'",
+    "extra": {
+      "count": 2384,
+      "layer_name": "Above Ground Facilities Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_03_above_ground_facilities_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_03_above_ground_facilities_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/3/query",
+    "sha256": "5a34cf7a1e0b7df29387c0ec5da4f6b065142381f08c3f14ef7613ea2e9017d9",
+    "size": 1413970,
+    "downloaded_at": "2026-09-03T19:02:31+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "3099 features, layer 'Above Ground Facilities Lines'",
+    "extra": {
+      "count": 3099,
+      "layer_name": "Above Ground Facilities Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_04_above_ground_facilities_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_04_above_ground_facilities_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/4/query",
+    "sha256": "2e589fa3d756177c51108278bb88567916b5c3f29584ba7a53334a09ba851419",
+    "size": 2275801,
+    "downloaded_at": "2026-09-03T19:02:38+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "4765 features, layer 'Above Ground Facilities Polygons'",
+    "extra": {
+      "count": 4765,
+      "layer_name": "Above Ground Facilities Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_06_a_permits_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_06_a_permits_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/6/query",
+    "sha256": "6143b836faf768eabdbc1b6253d21d5717527a0fa01b3780ca866a0fb07a56ae",
+    "size": 34430919,
+    "downloaded_at": "2026-09-03T19:03:49+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "97985 features, layer 'A Permits Points'",
+    "extra": {
+      "count": 97985,
+      "layer_name": "A Permits Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_07_a_permits_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_07_a_permits_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/7/query",
+    "sha256": "1a03fcb0e72be465f03080b3084240307ab7ca29e2dd0e4fa1e01829dccf95da",
+    "size": 128510,
+    "downloaded_at": "2026-09-03T19:03:51+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "289 features, layer 'A Permits Lines'",
+    "extra": {
+      "count": 289,
+      "layer_name": "A Permits Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_08_a_permits_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_08_a_permits_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/8/query",
+    "sha256": "d59097643e6010f11d00ea6b0bdd09260fbae5f7570115a180b0e91e7d7539a2",
+    "size": 10005,
+    "downloaded_at": "2026-09-03T19:04:03+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "19 features, layer 'A Permits Polygons'",
+    "extra": {
+      "count": 19,
+      "layer_name": "A Permits Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_11_b_permits_construction_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_11_b_permits_construction_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/11/query",
+    "sha256": "6ed64415e6fb8734ec243541be937cb694491d59e942dff65015c2e1137e424d",
+    "size": 977203,
+    "downloaded_at": "2026-09-03T19:04:07+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "2655 features, layer 'B Permits Construction Points'",
+    "extra": {
+      "count": 2655,
+      "layer_name": "B Permits Construction Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_12_b_permits_construction_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_12_b_permits_construction_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/12/query",
+    "sha256": "5deae7a3036e5f629abcee5b500b0e902e5c8bd82d9864558f02c2006f167286",
+    "size": 954249,
+    "downloaded_at": "2026-09-03T19:04:09+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "2023 features, layer 'B Permits Construction Lines'",
+    "extra": {
+      "count": 2023,
+      "layer_name": "B Permits Construction Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_13_b_permits_construction_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_13_b_permits_construction_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/13/query",
+    "sha256": "3c2f8ba2fcb1458fe4806bdec8f46ccdbb43e78c84c7634a92852aaaca08e9cd",
+    "size": 811071,
+    "downloaded_at": "2026-09-03T19:04:12+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "1509 features, layer 'B Permits Construction Polygons'",
+    "extra": {
+      "count": 1509,
+      "layer_name": "B Permits Construction Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_15_b_permits_design_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_15_b_permits_design_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/15/query",
+    "sha256": "318bff70d2936d06c79d2ad5b7ab193e2608062829f3a4b1afc42039a39c6207",
+    "size": 480598,
+    "downloaded_at": "2026-09-03T19:04:15+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "1345 features, layer 'B Permits Design Points'",
+    "extra": {
+      "count": 1345,
+      "layer_name": "B Permits Design Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_16_b_permits_design_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_16_b_permits_design_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/16/query",
+    "sha256": "dcbe93f61831b656a937327c9cf58ffe14bcb8b7f96edee93571a6aa97c2f5e3",
+    "size": 743065,
+    "downloaded_at": "2026-09-03T19:04:16+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "1537 features, layer 'B Permits Design Lines'",
+    "extra": {
+      "count": 1537,
+      "layer_name": "B Permits Design Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_17_b_permits_design_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_17_b_permits_design_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/17/query",
+    "sha256": "bea3590fe41fd0346f7b17908b00ac472ef1a2df5fef3089068d8b2da4931544",
+    "size": 462977,
+    "downloaded_at": "2026-09-03T19:04:18+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "877 features, layer 'B Permits Design Polygons'",
+    "extra": {
+      "count": 877,
+      "layer_name": "B Permits Design Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_19_claims_for_refunds_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_19_claims_for_refunds_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/19/query",
+    "sha256": "6caa1e8b00481a3c0790f49f1708ca9f992d4507ba074700970841877f366eaf",
+    "size": 1236677,
+    "downloaded_at": "2026-09-03T19:04:21+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "3636 features, layer 'Claims for Refunds Points'",
+    "extra": {
+      "count": 3636,
+      "layer_name": "Claims for Refunds Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_20_claims_for_refunds_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_20_claims_for_refunds_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/20/query",
+    "sha256": "ecb77ff06efb393c63ee1255bc16fd9abe497939222d3217a076a10176eb5dbf",
+    "size": 1182,
+    "downloaded_at": "2026-09-03T19:04:22+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "3 features, layer 'Claims for Refunds Lines'",
+    "extra": {
+      "count": 3,
+      "layer_name": "Claims for Refunds Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_21_claims_for_refunds_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_21_claims_for_refunds_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/21/query",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "downloaded_at": "2026-09-03T19:04:24+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "0 features, layer 'Claims for Refunds Polygons'",
+    "extra": {
+      "count": 0,
+      "layer_name": "Claims for Refunds Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_23_dye_test_certificate_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_23_dye_test_certificate_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/23/query",
+    "sha256": "1d6f1e537f2b22aa1d44333d413c43a868a601c96b9537d3576f1c82398f9c31",
+    "size": 467662,
+    "downloaded_at": "2026-09-03T19:04:25+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "1433 features, layer 'Dye Test Certificate Points'",
+    "extra": {
+      "count": 1433,
+      "layer_name": "Dye Test Certificate Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_24_dye_test_certificate_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_24_dye_test_certificate_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/24/query",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "downloaded_at": "2026-09-03T19:04:25+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "0 features, layer 'Dye Test Certificate Lines'",
+    "extra": {
+      "count": 0,
+      "layer_name": "Dye Test Certificate Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_25_dye_test_certificate_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_25_dye_test_certificate_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/25/query",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "downloaded_at": "2026-09-03T19:04:26+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "0 features, layer 'Dye Test Certificate Polygons'",
+    "extra": {
+      "count": 0,
+      "layer_name": "Dye Test Certificate Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_27_e_permits_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_27_e_permits_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/27/query",
+    "sha256": "c3a34c5ef38d0a74001ca5a17eb09ae382ec1a40710cfb489f3dafaf39743b76",
+    "size": 2845346,
+    "downloaded_at": "2026-09-03T19:04:31+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "7823 features, layer 'E Permits Points'",
+    "extra": {
+      "count": 7823,
+      "layer_name": "E Permits Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_28_e_permits_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_28_e_permits_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/28/query",
+    "sha256": "5ed696d06ad76c867a789240cf7f352f379ff5cafa470cf5cb8e88e0b71c864f",
+    "size": 198171,
+    "downloaded_at": "2026-09-03T19:04:32+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "470 features, layer 'E Permits Lines'",
+    "extra": {
+      "count": 470,
+      "layer_name": "E Permits Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_29_e_permits_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_29_e_permits_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/29/query",
+    "sha256": "bd1c28b645bae65ab022e83f45d3a8e15628db4d757d0c82a4cfb797a7ee746b",
+    "size": 15530,
+    "downloaded_at": "2026-09-03T19:04:34+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "30 features, layer 'E Permits Polygons'",
+    "extra": {
+      "count": 30,
+      "layer_name": "E Permits Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_31_highway_dedication_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_31_highway_dedication_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/31/query",
+    "sha256": "5f2e15977184e53825d6df230fa47b943ee556e07eb19dbd280162ba2c6d9aed",
+    "size": 371682,
+    "downloaded_at": "2026-09-03T19:04:36+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "1030 features, layer 'Highway Dedication Points'",
+    "extra": {
+      "count": 1030,
+      "layer_name": "Highway Dedication Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_32_highway_dedication_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_32_highway_dedication_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/32/query",
+    "sha256": "46b0a4f6137fb0cb4279061205727ca9673449d69b2da0655311c526ea4ec72e",
+    "size": 274914,
+    "downloaded_at": "2026-09-03T19:04:36+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "644 features, layer 'Highway Dedication Lines'",
+    "extra": {
+      "count": 644,
+      "layer_name": "Highway Dedication Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_33_highway_dedication_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_33_highway_dedication_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/33/query",
+    "sha256": "65c25ee50bc9f61fdd78f2e8a361d44010de65ed4f42b88a2d8d4a9a49e760e5",
+    "size": 9218,
+    "downloaded_at": "2026-09-03T19:04:38+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "19 features, layer 'Highway Dedication Polygons'",
+    "extra": {
+      "count": 19,
+      "layer_name": "Highway Dedication Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_35_planning_case_referral_form_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_35_planning_case_referral_form_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/35/query",
+    "sha256": "bf939811b8d669885719e009ac7c3603e9143733546e0efb3ed2ebc1bba4b6e2",
+    "size": 1183214,
+    "downloaded_at": "2026-09-03T19:04:41+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "3306 features, layer 'Planning Case Referral Form Points'",
+    "extra": {
+      "count": 3306,
+      "layer_name": "Planning Case Referral Form Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_36_planning_case_referral_form_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_36_planning_case_referral_form_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/36/query",
+    "sha256": "47415ceda9595f8a8ac05af3586ccc28687911e7e67ffc15d495d7e8b94c0ffb",
+    "size": 1064712,
+    "downloaded_at": "2026-09-03T19:04:44+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "2394 features, layer 'Planning Case Referral Form Lines'",
+    "extra": {
+      "count": 2394,
+      "layer_name": "Planning Case Referral Form Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_37_planning_case_referral_form_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_37_planning_case_referral_form_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/37/query",
+    "sha256": "316068c0ad0be444fe81721698d6e3c4bc2f48954ec78f769aaeb35af95da1d6",
+    "size": 138177,
+    "downloaded_at": "2026-09-03T19:04:45+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "255 features, layer 'Planning Case Referral Form Polygons'",
+    "extra": {
+      "count": 255,
+      "layer_name": "Planning Case Referral Form Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_39_revocable_permits_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_39_revocable_permits_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/39/query",
+    "sha256": "cea03de020937f0e92de4ef36c5ffaa36b8007071aa73e8fd638dfcf58adabb6",
+    "size": 1758523,
+    "downloaded_at": "2026-09-03T19:04:50+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "4565 features, layer 'Revocable Permits Points'",
+    "extra": {
+      "count": 4565,
+      "layer_name": "Revocable Permits Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_40_revocable_permits_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_40_revocable_permits_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/40/query",
+    "sha256": "dcd700cede3ddcdd9220a40b65c80f2e69083a9f7de76f3412858e663421e7cb",
+    "size": 445660,
+    "downloaded_at": "2026-09-03T19:04:51+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "978 features, layer 'Revocable Permits Lines'",
+    "extra": {
+      "count": 978,
+      "layer_name": "Revocable Permits Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_41_revocable_permits_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_41_revocable_permits_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/41/query",
+    "sha256": "391e8a5134889702622d960fc96b7483102fdaa50630c8ab90647ecc3107a0fb",
+    "size": 23262,
+    "downloaded_at": "2026-09-03T19:04:52+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "43 features, layer 'Revocable Permits Polygons'",
+    "extra": {
+      "count": 43,
+      "layer_name": "Revocable Permits Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_43_s_permits_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_43_s_permits_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/43/query",
+    "sha256": "b7df8cbbb70b8d5cdc6880925d17e5a436033b3720aa204af5737794c448cf16",
+    "size": 27112395,
+    "downloaded_at": "2026-09-03T19:05:42+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "76639 features, layer 'S Permits Points'",
+    "extra": {
+      "count": 76639,
+      "layer_name": "S Permits Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_44_s_permits_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_44_s_permits_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/44/query",
+    "sha256": "e1a14267411d51fc04a0b30bddca537e17ff376bafdd3060329bb1ce1a4de3df",
+    "size": 34752,
+    "downloaded_at": "2026-09-03T19:05:43+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "81 features, layer 'S Permits Lines'",
+    "extra": {
+      "count": 81,
+      "layer_name": "S Permits Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_45_s_permits_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_45_s_permits_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/45/query",
+    "sha256": "fff945c67b398209dfdca1ec7c92b5ef9a285df36c44a41fb3ed19babc729aef",
+    "size": 1600,
+    "downloaded_at": "2026-09-03T19:05:47+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "3 features, layer 'S Permits Polygons'",
+    "extra": {
+      "count": 3,
+      "layer_name": "S Permits Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_47_sewer_facilities_charges_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_47_sewer_facilities_charges_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/47/query",
+    "sha256": "b09abb2a8467b8b33b93dcf1a1082699e4dfcba2be1891c88266f2a661af8eb2",
+    "size": 43303949,
+    "downloaded_at": "2026-09-03T19:07:32+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "128524 features, layer 'Sewer Facilities Charges Points'",
+    "extra": {
+      "count": 128524,
+      "layer_name": "Sewer Facilities Charges Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_48_sewer_facilities_charges_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_48_sewer_facilities_charges_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/48/query",
+    "sha256": "cb8cac0da2ceba37a7ce60a3fdec0456fe386499cc5bb969d70c4adce5e20949",
+    "size": 222036,
+    "downloaded_at": "2026-09-03T19:07:34+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "544 features, layer 'Sewer Facilities Charges Lines'",
+    "extra": {
+      "count": 544,
+      "layer_name": "Sewer Facilities Charges Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_49_sewer_facilities_charges_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_49_sewer_facilities_charges_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/49/query",
+    "sha256": "41e7e8f2b41442b7f80daff1204163155e2520ca00076ade73d80a5410b7e2f9",
+    "size": 65475,
+    "downloaded_at": "2026-09-03T19:07:36+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "66 features, layer 'Sewer Facilities Charges Polygons'",
+    "extra": {
+      "count": 66,
+      "layer_name": "Sewer Facilities Charges Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_51_storm_drain_permits_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_51_storm_drain_permits_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/51/query",
+    "sha256": "2b0ba6f2a91466abcfc536916d47bfea6818e9451978198a18158d164c56f361",
+    "size": 178765,
+    "downloaded_at": "2026-09-03T19:07:37+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "503 features, layer 'Storm Drain Permits Points'",
+    "extra": {
+      "count": 503,
+      "layer_name": "Storm Drain Permits Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_52_storm_drain_permits_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_52_storm_drain_permits_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/52/query",
+    "sha256": "c0d7028f703486580ee1b2f87d55ded7c991f0602113468aa7287387a8529f5f",
+    "size": 6476,
+    "downloaded_at": "2026-09-03T19:07:37+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "16 features, layer 'Storm Drain Permits Lines'",
+    "extra": {
+      "count": 16,
+      "layer_name": "Storm Drain Permits Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_53_storm_drain_permits_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_53_storm_drain_permits_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/53/query",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "downloaded_at": "2026-09-03T19:07:38+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "0 features, layer 'Storm Drain Permits Polygons'",
+    "extra": {
+      "count": 0,
+      "layer_name": "Storm Drain Permits Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_55_street_furniture_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_55_street_furniture_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/55/query",
+    "sha256": "1fcd078f2c8f791ee766e6d02d57fe86a8da0f35bdabd4625cb6e901b0f14c53",
+    "size": 555145,
+    "downloaded_at": "2026-09-03T19:07:40+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "1843 features, layer 'Street Furniture Points'",
+    "extra": {
+      "count": 1843,
+      "layer_name": "Street Furniture Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_56_street_furniture_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_56_street_furniture_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/56/query",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "downloaded_at": "2026-09-03T19:07:41+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "0 features, layer 'Street Furniture Lines'",
+    "extra": {
+      "count": 0,
+      "layer_name": "Street Furniture Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_57_street_furniture_polygons.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_57_street_furniture_polygons.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/57/query",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "downloaded_at": "2026-09-03T19:07:42+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "0 features, layer 'Street Furniture Polygons'",
+    "extra": {
+      "count": 0,
+      "layer_name": "Street Furniture Polygons",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_59_u_permits_points.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_59_u_permits_points.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/59/query",
+    "sha256": "1708179ab5f06d2ef38bc1ee7d2421dd3088303762556ce4d01eea25e5c84e5e",
+    "size": 69183139,
+    "downloaded_at": "2026-09-03T19:10:09+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "186293 features, layer 'U Permits Points'",
+    "extra": {
+      "count": 186293,
+      "layer_name": "U Permits Points",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  },
+  "layer_60_u_permits_lines.geojsonl": {
+    "dataset": "la_city_boe_geocoder",
+    "filename": "layer_60_u_permits_lines.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer/60/query",
+    "sha256": "c75a7136d3fec50fd98277af4c81536697d06dd5a337482d25be15ec02986b4c",
+    "size": 24206090,
+    "downloaded_at": "2026-09-03T19:10:50+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "54600 features, layer 'U Permits Lines'",
+    "extra": {
+      "count": 54600,
+      "layer_name": "U Permits Lines",
+      "where": "1=1",
+      "out_fields": "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
+    }
+  }
+}

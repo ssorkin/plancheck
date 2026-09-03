@@ -1,0 +1,19 @@
+{
+  "tracts_2020_06037.geojsonl": {
+    "dataset": "tiger",
+    "filename": "tracts_2020_06037.geojsonl",
+    "url": "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2020/MapServer/6/query",
+    "sha256": "a30c6f77c8a70e85acb08063892f08d83ec621240f9107484a1ce29b51d80690",
+    "size": 7762984,
+    "downloaded_at": "2026-09-03T19:04:47+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "2020 census tracts, county 06037, TIGERweb 'Census Tracts'",
+    "extra": {
+      "count": 2498,
+      "layer_name": "Census Tracts",
+      "where": "STATE='06' AND COUNTY='037'",
+      "out_fields": "GEOID,NAME,BASENAME,AREALAND,AREAWATER,CENTLAT,CENTLON"
+    }
+  }
+}

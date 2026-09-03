@@ -1,0 +1,19 @@
+id: boe-location-free-text
+dataset: boe_permits
+years: [1987, 2026]
+kind: schema
+title: BOE permit locations are free text (addresses, intersections, corners, ranges)
+description: >
+  The Bureau of Engineering table (j7mw-thyc) has no coordinates. LOCATION is typed by
+  staff: "5249 N VANALDEN AVE", "Texas Ave and Ohio Ave", "S/W CORNER OF VIRGINA AVE and
+  AND ST ANDREWS PL", "619,621,623 TOWNE AVE. and E. 6TH ST", "F 6615 FRANKLIN AVE", or
+  descriptions with no street ("FORREST LAWN 225` E/O MH 8340"). 979 rows are null.
+evidence: >
+  Sample of 200 rows offset 123456: CAMS batch geocoder matched 92% raw; one false positive
+  ("118TH PLACE and BROADWAY AVE" -> "118 Palace St", score 87).
+handling: >
+  Two-step: (1) join to the city's own BOE Permits Geocoder map service by RefNo, which
+  carries points/lines/polygons for ~603k of 636k permits; (2) parse the string
+  (geocode/address.py) into an address or intersection and query the county CAMS locator,
+  then the city centerline locator, accepting only score >= 90 with a match type consistent
+  with the parsed kind. Unparseable strings stay unlocated with a reason code.

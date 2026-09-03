@@ -1,0 +1,14 @@
+id: ladbs-ct-tract-vintage
+dataset: ladbs CT column
+years: [2000, 2026]
+kind: vintage
+title: LADBS census tract (CT) is assigned at processing time and may predate the 2020 tract vintage
+description: >
+  CT values such as "1173.01" match 2010 or 2020 tract codes depending on when the record
+  was processed. The pipeline joins every located permit to 2020 TIGER tracts spatially and
+  keeps the source value as tract_src.
+evidence: >
+  pc check reports tract disagreement by year (tract_disagrees flag in permits_geo).
+handling: >
+  All tract-level analysis uses the spatially joined 2020 tract_geoid; tract_src is
+  retained for auditing only.

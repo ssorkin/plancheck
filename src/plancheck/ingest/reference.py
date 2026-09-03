@@ -35,8 +35,13 @@ def _load(path, id_field: str, name_field: str) -> pl.DataFrame:
             )
     return pl.DataFrame(
         rows,
-        schema={"id": pl.Utf8, "name": pl.Utf8, "props": pl.Utf8, "geom_type": pl.Utf8,
-                "wkb": pl.Binary},
+        schema={
+            "id": pl.Utf8,
+            "name": pl.Utf8,
+            "props": pl.Utf8,
+            "geom_type": pl.Utf8,
+            "wkb": pl.Binary,
+        },
     )
 
 
@@ -44,6 +49,8 @@ def ingest_layers(ahj: AHJ) -> None:
     out_root = PARQUET_DIR / "ref" / f"ahj={ahj.slug}"
     for dataset, layers in (("reference", ahj.reference), ("covariates", ahj.covariates)):
         for name, spec in layers.items():
+            if spec.get("geometry", True) is False:
+                continue  # attribute tables (e.g. assessor) have their own ingester
             path = RAW_DIR / f"{ahj.slug}_{dataset}" / f"{name}.geojsonl"
             if not path.exists():
                 print(f"  skip {name}: {path} not downloaded")

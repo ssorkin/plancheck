@@ -8,6 +8,7 @@ in the street field joined by `intersection_joiner` ("A & B").
 from __future__ import annotations
 
 import json
+import math
 import time
 
 import httpx
@@ -117,15 +118,18 @@ class ArcgisLocator:
             xy = loc.get("location") or {}
             try:
                 lon, lat = float(xy.get("x")), float(xy.get("y"))
-                if lon != lon or lat != lat:  # NaN
+                if math.isnan(lon) or math.isnan(lat):
                     lon = lat = None
             except (TypeError, ValueError):
                 lon = lat = None
             score = a.get("Score", loc.get("score"))
             results.append(
                 GeocodeResult(
-                    key=q.key, geocoder=self.name, status=status,
-                    lat=lat, lon=lon,
+                    key=q.key,
+                    geocoder=self.name,
+                    status=status,
+                    lat=lat,
+                    lon=lon,
                     score=float(score) if score is not None else None,
                     match_type=a.get("Addr_type") or None,
                     matched_address=a.get("Match_addr") or loc.get("address") or None,

@@ -161,19 +161,29 @@ ahjs:
         order_by: OBJECTID
         join: polygon
       hpoz:
-        url: https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Historic_Preservation_Overlay_Zones/FeatureServer/0
+        url: https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Historic_Preservation_Overlay_Zones/FeatureServer/5
         id_field: OBJECTID
         name_field: NAME
         out_fields: "*"
         order_by: OBJECTID
         join: polygon
       rail_stations:
-        url: https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Metro_Rail_Stations_2026/FeatureServer/0
+        url: https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Metro_Rail_Stations_2026/FeatureServer/69
         id_field: OBJECTID
-        name_field: STATION
+        name_field: STATION_NM
         out_fields: "*"
         order_by: OBJECTID
         join: nearest
+      # LA County assessor roll (attributes only; AIN = APN). One roll year, city parcels.
+      assessor:
+        url: https://services.arcgis.com/RmCCgQtiZLDCtblq/arcgis/rest/services/Parcel_Data_2021_Table/FeatureServer/0
+        id_field: AIN
+        name_field: PropertyLocation
+        out_fields: "AIN,RollYear,UseType,UseCode,UseCodeDescChar1,YearBuilt,EffectiveYearBuilt,SQFTmain,Units,Bedrooms,Bathrooms,Roll_LandValue,Roll_ImpValue,Roll_TotalValue,Roll_LandBaseYear,Roll_ImpBaseYear,SitusZIP5,CENTER_LAT,CENTER_LON"
+        order_by: OBJECTID
+        where: "RollYear='2025' AND TaxRateArea_CITY='LOS ANGELES'"
+        geometry: false
+        join: apn
 
     # Batch geocoders, in the order the chain consults them. `fields` maps the generic
     # query parts onto each locator's address fields (Esri single-line input is NOT

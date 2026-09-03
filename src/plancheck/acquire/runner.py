@@ -41,16 +41,23 @@ def acquire_geometries(a: AHJ, refresh: bool, force: bool) -> None:
         if g["kind"] != "arcgis_mapserver":
             print(f"  skip: unsupported kind {g['kind']}")
             continue
+        failed = []
         for layer_id, layer_name in mapserver_sublayers(g["url"], g["layer_name_regex"]):
-            fetch_layer_jsonl(
-                dataset,
-                f"layer_{layer_id:02d}_{slugify(layer_name)}",
-                f"{g['url']}/{layer_id}",
-                out_fields=g.get("out_fields", "*"),
-                order_by=g.get("order_by"),
-                refresh=refresh,
-                force=force,
-            )
+            try:
+                fetch_layer_jsonl(
+                    dataset,
+                    f"layer_{layer_id:02d}_{slugify(layer_name)}",
+                    f"{g['url']}/{layer_id}",
+                    out_fields=g.get("out_fields", "*"),
+                    order_by=g.get("order_by"),
+                    refresh=refresh,
+                    force=force,
+                )
+            except Exception as exc:  # noqa: BLE001 — one bad sublayer must not stop the rest
+                print(f"  FAILED layer {layer_id} {layer_name!r}: {exc}")
+                failed.append(layer_id)
+        if failed:
+            print(f"  {gname}: {len(failed)} layer(s) failed: {failed} (rerun to retry)")
 
 
 def _acquire_layers(a: AHJ, layers: dict, dataset: str, refresh: bool, force: bool) -> None:
@@ -58,15 +65,20 @@ def _acquire_layers(a: AHJ, layers: dict, dataset: str, refresh: bool, force: bo
 
     for name, spec in layers.items():
         print(f"{a.slug}/{dataset}/{name}: {spec['url']}")
-        fetch_layer_jsonl(
-            f"{a.slug}_{dataset}",
-            name,
-            spec["url"],
-            out_fields=spec.get("out_fields", "*"),
-            order_by=spec.get("order_by"),
-            refresh=refresh,
-            force=force,
-        )
+        try:
+            fetch_layer_jsonl(
+                f"{a.slug}_{dataset}",
+                name,
+                spec["url"],
+                out_fields=spec.get("out_fields", "*"),
+                where=spec.get("where", "1=1"),
+                order_by=spec.get("order_by"),
+                return_geometry=spec.get("geometry", True),
+                refresh=refresh,
+                force=force,
+            )
+        except Exception as exc:  # noqa: BLE001
+            print(f"  FAILED {name}: {exc}")
 
 
 def run_acquire(

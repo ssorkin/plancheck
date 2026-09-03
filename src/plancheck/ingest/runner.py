@@ -25,6 +25,9 @@ def run_ingest(ahj: str = "all", source: str = "all", family: str = "all") -> No
             from plancheck.ingest.reference import ingest_layers
 
             ingest_layers(a)
+            from plancheck.ingest.assessor import ingest_assessor
+
+            ingest_assessor(a)
     if family in ("all", "census"):
         from plancheck.ingest.census import ingest_acs, ingest_tracts
 

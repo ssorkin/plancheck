@@ -8,20 +8,39 @@ CASES = [
     ("19150 Harnett St. and Vanalden Ave.", "address", "19150", "HARNETT ST", "VANALDEN AVE", ()),
     ("Texas Ave and Ohio Ave", "intersection", None, "OHIO AVE", "TEXAS AVE", ()),
     ("228TH ST & LOCKNESS AVE", "intersection", None, "228TH ST", "LOCKNESS AVE", ()),
-    ("S/W CORNER OF VIRGINA AVE  and AND ST ANDREWS PL", "intersection", None,
-     "ST ANDREWS PL", "VIRGINA AVE", ()),
+    (
+        "S/W CORNER OF VIRGINA AVE  and AND ST ANDREWS PL",
+        "intersection",
+        None,
+        "ST ANDREWS PL",
+        "VIRGINA AVE",
+        (),
+    ),
     ("F 6615 FRANKLIN AVE", "address", "6615", "FRANKLIN AVE", None, ()),
-    ("619,621,623 TOWNE AVE. and E. 6TH ST", "address", "619", "TOWNE AVE", "E 6TH ST",
-     ("621", "623")),
-    ("1016-20 1/2 W. 23RD ST. and TOBERMAN ST.", "address", "1016", "W 23RD ST", "TOBERMAN ST",
-     ("1020",)),
+    (
+        "619,621,623 TOWNE AVE. and E. 6TH ST",
+        "address",
+        "619",
+        "TOWNE AVE",
+        "E 6TH ST",
+        ("621", "623"),
+    ),
+    (
+        "1016-20 1/2 W. 23RD ST. and TOBERMAN ST.",
+        "address",
+        "1016",
+        "W 23RD ST",
+        "TOBERMAN ST",
+        ("1020",),
+    ),
     ("118TH PLACE and BROADWAY AVE", "intersection", None, "118TH PL", "BROADWAY AVE", ()),
     ("434 n martel  and rosewood ave", "address", "434", "N MARTEL", "ROSEWOOD AVE", ()),
     ("N/E corner Noble & lassen and Noble/Lassen", "intersection", None, "LASSEN", "NOBLE", ()),
     ("REAR OF 55 ELM AVENUE", "address", "55", "ELM AVE", None, ()),
     ("972-980 E.ELKLAND PL.,", "address", "972", "E ELKLAND PL", None, ("980",)),
     ("123 MAIN ST, LOS ANGELES 90012", "address", "123", "MAIN ST", None, ()),
-    ("10201 W PICO BLVD B103, L5", "address", "10201", "W PICO BLVD B103", None, ()),
+    ("10201 W PICO BLVD B103, L5", "address", "10201", "W PICO BLVD", None, ()),
+    ("922 N NORMANDIE AVE 1-11", "address", "922", "N NORMANDIE AVE", None, ()),
     ("VANALDEN AV and SCHOENBORN ST", "intersection", None, "SCHOENBORN ST", "VANALDEN AVE", ()),
 ]
 
@@ -60,8 +79,7 @@ def test_unparsed_cases():
 
 
 def test_normalize_street():
-    assert normalize_street("north figueroa street") == "north figueroa street".upper().replace(
-        "NORTH", "N").replace("STREET", "ST")
+    assert normalize_street("north figueroa street") == "N FIGUEROA ST"
     assert normalize_street("SAINT ANDREWS PL") == "ST ANDREWS PL"
     assert normalize_street("118 TH PLACE") == "118TH PL"
     assert normalize_street("SUNSET BLVD WEST") == "SUNSET BLVD W"

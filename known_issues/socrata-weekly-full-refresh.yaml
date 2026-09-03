@@ -1,0 +1,16 @@
+id: socrata-weekly-full-refresh
+dataset: all LADBS datasets
+years: [2026]
+kind: provenance
+title: LADBS tables are replaced wholesale every week; row histories are not retained upstream
+description: >
+  Every row carries the same REFRESH_TIME and Socrata :updated_at after each weekly load, so
+  status changes (issued -> finaled -> expired) overwrite earlier states and incremental
+  pulls are impossible. The BOE table refreshes daily the same way.
+evidence: >
+  SODA select refresh_time, count(*) group by refresh_time on pi9x-tg5x returns one value
+  for all 409,619 rows (2026-08-30).
+handling: >
+  pc acquire downloads full snapshots with ETag/Last-Modified conditional requests and
+  records sha256 + the portal's count(*) in manifests/socrata.json. Status-transition
+  analysis would require keeping dated snapshots (not done in v1).
