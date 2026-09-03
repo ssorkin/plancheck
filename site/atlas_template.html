@@ -192,6 +192,7 @@ function render(){
     ? DIV.map((c,i) => `<div class="row"><span class="sw" style="background:${c}"></span><span>${i===0 ? "≤ "+fmt(breaks[0]) : i===DIV.length-1 ? "≥ "+fmt(breaks[4]) : i===4 ? "0" : ""}</span></div>`)
     : RAMP.map((c,i) => `<div class="row"><span class="sw" style="background:${c}"></span><span>${i < breaks.length ? "≤ "+fmt(breaks[i], S.metric) : "> "+fmt(breaks[breaks.length-1], S.metric)}</span></div>`);
   lg.innerHTML = cap + rows.join("") + `<div class="row"><span class="sw" style="background:transparent"></span><span>no permits</span></div>`;
+  syncHash();
 }
 function chart(){
   const rows = D.series.filter(r => r.year >= D.years.start && r.year <= D.years.end);
