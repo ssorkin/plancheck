@@ -118,8 +118,8 @@ const CLASS_COLOR = {building:"#2a78d6", electrical:"#eb6834", mechanical:"#1baf
 const CLASS_LABEL = {building:"Building", electrical:"Electrical", mechanical:"Mechanical", right_of_way:"Right-of-way"};
 const S = {geo:"tract", cls:"building", metric:"n_permits", y0:D.years.start, y1:D.years.end, perkm2:true};
 // Permalink: every control lives in the URL hash (#geo=tract&cls=building&metric=n_permits&y0=2013&y1=2026&per=1).
-(function restore(){ const h = new URLSearchParams(location.hash.replace(/^#/, "")); if (h.get("geo") && D.geos[h.get("geo")]) S.geo = h.get("geo"); if (h.get("cls") && CLASS_LABEL[h.get("cls")]) S.cls = h.get("cls"); if (h.get("metric") && METRICS[h.get("metric")]) S.metric = h.get("metric"); if (h.get("y0")) S.y0 = Math.max(D.years.start, Math.min(D.years.end, +h.get("y0"))); if (h.get("y1")) S.y1 = Math.max(S.y0, Math.min(D.years.end, +h.get("y1"))); if (h.get("per") != null) S.perkm2 = h.get("per") !== "0"; })();
-function syncHash(){ const h = new URLSearchParams({geo:S.geo, cls:S.cls, metric:S.metric, y0:S.y0, y1:S.y1, per:S.perkm2?"1":"0"}); history.replaceState(null, "", "#" + h.toString()); }
+(function restore(){ const h = new URLSearchParams(location.hash.replace(/^#/, "")); if (h.get("geo") && D.geos[h.get("geo")]) S.geo = h.get("geo"); if (h.get("cls") && CLASS_LABEL[h.get("cls")]) S.cls = h.get("cls"); if (h.get("metric") && METRICS[h.get("metric")]) S.metric = h.get("metric"); if (h.get("y0")) S.y0 = Math.max(D.years.start, Math.min(D.years.end, +h.get("y0"))); if (h.get("y1")) S.y1 = Math.max(S.y0, Math.min(D.years.end, +h.get("y1"))); if (h.get("per") != null) S.perkm2 = h.get("per") !== "0"; const v = (h.get("v") || "").split(",").map(Number); if (v.length === 3 && v.every(Number.isFinite)) S.view = v; })();
+function syncHash(){ const h = new URLSearchParams({geo:S.geo, cls:S.cls, metric:S.metric, y0:S.y0, y1:S.y1, per:S.perkm2?"1":"0"}); if (typeof map !== "undefined" && map._loaded) { const c = map.getCenter(); h.set("v", `${c.lat.toFixed(4)},${c.lng.toFixed(4)},${map.getZoom()}`); } history.replaceState(null, "", "#" + h.toString()); }
 function detailUrl(p){ const q = new URLSearchParams({geo:S.geo, id:p.id, cls:S.cls, metric:S.metric, y0:S.y0, y1:S.y1}); return `${DETAIL_BASE}?${q}`; }
 const FEATS = () => D.geos[S.geo].fc.features;
 const fmt = (v, m) => v==null ? "—" : (m==="valuation_sum" ? "$"+Math.round(v).toLocaleString() : Math.abs(v) < 10 ? v.toLocaleString(undefined,{maximumFractionDigits:1}) : Math.round(v).toLocaleString());
@@ -137,7 +137,8 @@ document.getElementById("st-date").textContent = D.generated;
 const map = L.map("map", {preferCanvas:true, zoomControl:true, attributionControl:false});
 L.geoJSON(D.city, {interactive:false, style:{color:"#8a919c", weight:1.4, fill:false}}).addTo(map);
 const cdLayer = L.geoJSON(D.cds, {interactive:false, style:{color:"#8a919c", weight:0.7, dashArray:"3 3", fill:false}});
-map.fitBounds(L.geoJSON(D.city).getBounds());
+if (S.view) map.setView([S.view[0], S.view[1]], S.view[2]); else map.fitBounds(L.geoJSON(D.city).getBounds());
+map.on("moveend", () => syncHash());
 let layer = null;
 
 function value(p){
