@@ -102,7 +102,7 @@ async function init(){
   for (const id of ["layer","cls","metric"]) { const el=document.getElementById(id); el.value=state[id]; el.onchange=async()=>{ state[id]=el.value; if(!state.data[state.layer]) { state.data[state.layer]=await load(state.layer); scanAvail(state.data[state.layer]); } if(id==="cls") fillMetrics(); render(); }; }
   document.getElementById("perkm2").onchange = e => { state.perkm2=e.target.checked; render(); };
   document.getElementById("note").textContent = `Data generated ${meta.generated.slice(0,10)} · issued permits only · source: LADBS & BOE via data.lacity.org`;
-  try { const city = await load("city_boundary"); cityLayer = L.geoJSON(city, {style:{weight:1.2, color:"#52514e", fill:false}}).addTo(map); } catch(e) {}
+  try { const city = await load("city_boundary"); cityLayer = L.geoJSON(city, {interactive:false, style:{weight:1.2, color:"#52514e", fill:false}}).addTo(map); } catch(e) {}
   state.data.tract = await load("tract");
   scanAvail(state.data.tract); fillMetrics();
   render();
