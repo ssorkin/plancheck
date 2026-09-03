@@ -32,6 +32,8 @@ body { margin: 0; background: var(--ground); color: var(--ink); font: 15px/1.5 "
 .titleblock .sub { color: var(--ink-2); max-width: 62ch; margin: 6px 0 0; }
 .stamps { display: grid; grid-template-columns: repeat(3, auto); gap: 0 22px; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 12px; color: var(--ink-2); }
 .stamps b { display: block; font: 600 26px/1.1 "Barlow Condensed", "Arial Narrow", sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+.theme { grid-column: 1 / -1; justify-self: end; font: 500 11px/1 "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); background: transparent; border: 1px solid var(--rule-strong); padding: 5px 9px; border-radius: 2px; cursor: pointer; margin-top: 6px; }
+.theme:hover { color: var(--ink); border-color: var(--ink-3); }
 .stamps span { text-transform: uppercase; letter-spacing: .08em; font-size: 10.5px; color: var(--ink-3); }
 .grid { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; }
 @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .titleblock { grid-template-columns: 1fr; } }
@@ -79,6 +81,7 @@ select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px s
       <div><span>Permits located</span><b id="st-loc">—</b></div>
       <div><span>Of records</span><b id="st-tot">—</b></div>
       <div><span>Data as of</span><b id="st-date">—</b></div>
+      <span class="toggle-slot"></span>
     </div>
   </div>
   <div class="grid">
@@ -199,4 +202,7 @@ document.getElementById("yr0").textContent = S.y0; document.getElementById("yr1"
 for (const id of ["cls","metric"]) { const el = document.getElementById(id); el.value = S[id]; el.onchange = () => { S[id] = el.value; if (id === "cls") fillMetrics(); render(); }; }
 document.getElementById("perkm2").onchange = e => { S.perkm2 = e.target.checked; render(); };
 chart(); render();
+const tb = document.getElementById("theme");
+if (tb) { const cur = () => document.documentElement.dataset.theme || "dark"; const label = () => { tb.textContent = cur() === "dark" ? "Light" : "Dark"; };
+  tb.onclick = () => { const n = cur() === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = n; try { localStorage.setItem("theme", n); } catch (e) {} label(); }; label(); }
 </script>

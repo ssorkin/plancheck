@@ -16,6 +16,14 @@ page in `site/index.html`). AHJs are pluggable: `config/sources.yaml` + `src/pla
 - `uv run pytest` — tests (no network; fixtures in `tests/fixtures/`); `uv run ruff check src tests`.
 - Keys: `SOCRATA_APP_TOKEN` (optional) and `CENSUS_API_KEY` (required for ACS) in the
   environment or a git-ignored `.env`.
+- Site: `scripts/build_atlas.py --standalone data/site/index.html` builds the LA Permit Atlas
+  (dark by default, theme toggle); `scripts/deploy.sh [--no-build] [--no-verify]` rsyncs
+  `data/site/` to dronesclub `/var/www/plancheck-releases/<ts>/`, swaps the
+  `/var/www/plancheck-current` symlink (`ln -s` + `mv -T`), prunes to 3, verifies
+  https://plancheck.sorkinlabs.com (Cloudflare-proxied; nginx config in `contrib/nginx/`,
+  cert via certbot webroot). NEVER `rsync --delete` into the live root.
+- Weekly refresh: `scripts/refresh.sh` (acquire --refresh → … → export; add `scripts/deploy.sh`
+  after it when scheduling).
 - Full rebuild from nothing: `pc acquire` (~4 GB, ~40 min) → `pc ingest` → `pc geocode`
   (network for unmatched strings only; cached in `data/parquet/geocode_cache/`) → `pc check`
   → `pc analyze` → `pc export --inline`.

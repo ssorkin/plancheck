@@ -12,7 +12,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPORT = ROOT / "data" / "export"
-OUT = Path(sys.argv[1]) if len(sys.argv) > 1 else EXPORT / "atlas.html"
+args = [a for a in sys.argv[1:] if not a.startswith("--")]
+STANDALONE = "--standalone" in sys.argv  # full document, dark by default, with a theme toggle
+OUT = Path(args[0]) if args else EXPORT / "atlas.html"
 
 tracts = json.loads((EXPORT / "tracts.geojson").read_text())
 cds = json.loads((EXPORT / "council_districts.geojson").read_text())
@@ -44,5 +46,20 @@ blob = json.dumps(payload, separators=(",", ":")).replace("</", "<\\/")
 leaflet_css = (ROOT / "site" / "leaflet.css").read_text()  # inlined: the page may be served under a CSP
 html = (ROOT / "site" / "atlas_template.html").read_text()
 html = html.replace("/*__LEAFLET_CSS__*/", leaflet_css).replace("/*__DATA__*/null", blob)
+if STANDALONE:
+    head = (
+        '<!doctype html>\n<html lang="en" data-theme="dark">\n<head>\n<meta charset="utf-8">\n'
+        '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+        '<meta name="description" content="Every building, trade and right-of-way permit the City '
+        'of Los Angeles publishes, located and summed by census tract.">\n'
+        '<link rel="icon" href="data:image/svg+xml,'
+        "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' "
+        "font-size='90'%3E%F0%9F%8F%97%EF%B8%8F%3C/text%3E%3C/svg%3E\">\n"
+        '<script>try{const t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>\n'
+    )
+    html = html.replace("<title>", head + "<title>", 1)
+    html = html.replace("</title>", "</title>\n</head>\n<body>", 1) + "\n</body>\n</html>\n"
+    html = html.replace('<span class="toggle-slot"></span>',
+                        '<button id="theme" class="theme" type="button" aria-label="Switch theme">Light</button>')
 OUT.write_text(html)
 print(f"wrote {OUT} ({OUT.stat().st_size / 1e6:.1f} MB)")

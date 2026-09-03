@@ -29,8 +29,9 @@ than patched.
   valuation, solar, EV) by tract, council district, community plan area, neighborhood
   council and H3 hex, by year, and relates it to income, tenure, density, building age,
   zoning and rail proximity.
-- **Publishes** figures (`analysis/figures/`) and a standalone Leaflet map (`pc export
-  --inline` → `data/export/map.html`).
+- **Publishes** figures (`analysis/figures/`), a standalone Leaflet map (`pc export
+  --inline` → `data/export/map.html`) and the [LA Permit Atlas](https://plancheck.sorkinlabs.com)
+  (`scripts/build_atlas.py`, deployed with `scripts/deploy.sh`).
 
 The AHJ (authority having jurisdiction) layer is pluggable: `config/sources.yaml` registers
 sources, geometry services, reference layers and geocoders per jurisdiction, and a small
