@@ -86,7 +86,14 @@ def export_detail(con: duckdb.DuckDBPyConnection | None = None) -> dict[str, int
         counts[slug] = len(index)
         print(f"  index_{slug}.json: {len(index):,} areas, {avg:.1f} row groups each on average")
     (out_dir / "meta.json").write_text(
-        json.dumps({"row_group": ROW_GROUP, "rows": n, "geographies": GEO_SLUGS})
+        json.dumps(
+            {
+                "row_group": ROW_GROUP,
+                "rows": n,
+                "geographies": GEO_SLUGS,
+                "byte_length": path.stat().st_size,
+            }
+        )
     )
     if own:
         con.close()

@@ -20,6 +20,10 @@ a { color: var(--accent-ink); }
 .stamps b { display:block; font:600 26px/1.1 "Barlow Condensed","Arial Narrow",sans-serif; color:var(--ink); font-variant-numeric:tabular-nums; }
 .stamps span { text-transform:uppercase; letter-spacing:.08em; font-size:10.5px; color:var(--ink-3); }
 .grid { display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:16px; }
+.grid > * { min-width:0; }
+.main { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; align-content:start; }
+.panel { min-width:0; }
+.tablewrap { max-width:100%; }
 @media (max-width: 960px) { .grid { grid-template-columns:1fr; } .titleblock { grid-template-columns:1fr; } .stamps { grid-template-columns:repeat(2,auto); } }
 .panel { background:var(--sheet); border:1px solid var(--rule); padding:14px 16px; }
 .panel h2 { margin:0 0 10px; font:600 13px/1 "IBM Plex Mono",ui-monospace,monospace; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-3); }
@@ -62,7 +66,7 @@ select:focus-visible, input:focus-visible, button:focus-visible, th:focus-visibl
     </div>
   </div>
   <div class="grid">
-    <div style="display:grid; gap:16px; align-content:start">
+    <div class="main">
       <div class="mapwrap"><div id="map"></div></div>
       <div class="panel">
         <h2 id="list-h">Permits</h2>
@@ -88,7 +92,7 @@ select:focus-visible, input:focus-visible, button:focus-visible, th:focus-visibl
   </div>
 </div>
 <script type="module">
-import { asyncBufferFromUrl, parquetReadObjects } from "./vendor/hyparquet.mjs";
+import { asyncBufferFromUrl, parquetMetadataAsync, parquetReadObjects } from "./vendor/hyparquet.mjs";
 import { compressors } from "./vendor/hyparquet-compressors.mjs";
 const META = /*__META__*/null;
 const P = new URLSearchParams(location.search);
@@ -121,6 +125,9 @@ function syncUrl(){ const u = new URL(location.href); for (const k of ["geo","id
 // ---- data: one spatially sorted parquet + a per-geography index of row groups per area.
 const dec = new TextDecoder();
 const asStr = v => v == null ? null : (v instanceof Uint8Array ? dec.decode(v) : String(v));
+const COLUMNS = ["permit_id","permit_class","permit_type","permit_subtype","status","issue_date","final_date","year","completed_year","address","valuation","du","work_desc","lat","lon","source_url","is_new_building","is_addition","is_demolition","is_adu","is_solar","is_ev","is_completed"];
+// Byte span of one row group (all its column chunks are contiguous in the file).
+function groupSpan(md, k){ let start = Infinity, end = 0; for (const c of md.row_groups[k].columns) { const m = c.meta_data; const off = Number(m.dictionary_page_offset ?? m.data_page_offset); start = Math.min(start, off); end = Math.max(end, off + Number(m.total_compressed_size)); } return [start, end]; }
 async function loadRows(){
   const [index, dmeta] = await Promise.all([
     (await fetch(`data/detail/index_${S.geo}.json`)).json(),
@@ -128,12 +135,24 @@ async function loadRows(){
   ]);
   const groups = index[S.id] || [];
   if (!groups.length) return [];
-  const file = await asyncBufferFromUrl({ url: "data/detail/permits.parquet" });
-  const rg = dmeta.row_group, col = `g_${S.geo}`;
-  const ranges = []; for (const g of groups) { const l = ranges[ranges.length-1]; if (l && l[1] === g*rg) l[1] = (g+1)*rg; else ranges.push([g*rg, (g+1)*rg]); }
-  document.getElementById("status").textContent = `Fetching ${ranges.length} block${ranges.length>1?"s":""} of permits…`;
-  let rows = [];
-  for (const [a,b] of ranges) { const part = await parquetReadObjects({ file, rowStart:a, rowEnd:b, compressors }); rows = rows.concat(part.filter(r => asStr(r[col]) === S.id)); }
+  const url = "data/detail/permits.parquet", byteLength = dmeta.byte_length, rg = dmeta.row_group, col = `g_${S.geo}`;
+  const file = await asyncBufferFromUrl({ url, byteLength });
+  const md = await parquetMetadataAsync(file);
+  // Each contiguous run of row groups is one range request, parsed from memory.
+  const runs = []; for (const g of groups) { const l = runs[runs.length-1]; if (l && l.g1 === g) l.g1 = g + 1; else runs.push({ g0: g, g1: g + 1 }); }
+  const status = document.getElementById("status"); let done = 0, next = 0;
+  status.textContent = `Fetching ${groups.length} block${groups.length>1?"s":""} of permits…`;
+  const results = new Array(runs.length);
+  async function worker(){ while (next < runs.length) { const i = next++; const { g0, g1 } = runs[i];
+    const [s0] = groupSpan(md, g0), [, e1] = groupSpan(md, g1 - 1);
+    const res = await fetch(url, { headers: { Range: `bytes=${s0}-${e1 - 1}` } });
+    if (res.status !== 206 && res.status !== 200) throw new Error(`range request failed (${res.status})`);
+    const buf = await res.arrayBuffer();
+    const local = { byteLength, slice: (a, b) => (a >= s0 && (b ?? byteLength) <= e1) ? buf.slice(a - s0, (b ?? byteLength) - s0) : file.slice(a, b) };
+    const part = await parquetReadObjects({ file: local, metadata: md, rowStart: g0 * rg, rowEnd: g1 * rg, columns: [col, ...COLUMNS], compressors });
+    results[i] = part.filter(r => asStr(r[col]) === S.id); done += g1 - g0; status.textContent = `Fetched ${done} of ${groups.length} blocks…`; } }
+  await Promise.all(Array.from({ length: Math.min(4, runs.length) }, worker));
+  const rows = results.flat();
   return rows.map(r => ({ ...r, permit_id: asStr(r.permit_id), address: asStr(r.address), work_desc: asStr(r.work_desc), permit_type: asStr(r.permit_type), permit_subtype: asStr(r.permit_subtype), status: asStr(r.status), permit_class: asStr(r.permit_class), source_url: asStr(r.source_url),
     issue_date: r.issue_date ? new Date(r.issue_date).toISOString().slice(0,10) : null, final_date: r.final_date ? new Date(r.final_date).toISOString().slice(0,10) : null,
     year: r.year==null?null:Number(r.year), completed_year: r.completed_year==null?null:Number(r.completed_year), valuation: r.valuation==null?null:Number(r.valuation), du: r.du==null?null:Number(r.du), lat: r.lat==null?null:Number(r.lat), lon: r.lon==null?null:Number(r.lon) }));
