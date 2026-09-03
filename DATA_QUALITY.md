@@ -4,6 +4,14 @@ Generated 2026-09-03 by `pc check`. Problems in the source data are surfaced her
 
 ## Known issues (documented registry)
 
+### BOE Permits Geocoder sublayer 61 ("U Permits Polygons") answers 502 on every query
+
+*source-outage, affects la_city_boe_geocoder 2026* — id `boe-geocoder-layer-61-unavailable`
+
+The city's map service returns HTTP 502 for layer 61 (U Permits Polygons, about 2,000 features) on count and feature queries, across retries and repeated runs on 2026-09-03, while the other 47 permit sublayers download normally.
+
+**Handling:** The layer is skipped and reported by pc acquire; affected excavation permits fall through to the CAMS and centerline locators on their location string. Rerun `pc acquire --family geometries` to pick the layer up once the service recovers.
+
 ### BOE permit locations are free text (addresses, intersections, corners, ranges)
 
 *schema, affects boe_permits 1987, 2026* — id `boe-location-free-text`
