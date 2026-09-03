@@ -95,6 +95,7 @@ select:focus-visible, input:focus-visible, button:focus-visible, th:focus-visibl
 import { asyncBufferFromUrl, parquetMetadataAsync, parquetReadObjects } from "./vendor/hyparquet.mjs";
 import { compressors } from "./vendor/hyparquet-compressors.mjs";
 const META = /*__META__*/null;
+const V = encodeURIComponent(META.generated);  // cache-buster: every deploy is a new store
 const P = new URLSearchParams(location.search);
 const S = { geo: P.get("geo") || "tract", id: P.get("id") || "", cls: P.get("cls") || "building", metric: P.get("metric") || "n_permits", y0: +(P.get("y0") || META.years.start), y1: +(P.get("y1") || META.years.end), q: P.get("q") || "" };
 const CLASS_LABEL = {building:"Building", electrical:"Electrical", mechanical:"Mechanical", right_of_way:"Right-of-way (BOE)"};
@@ -130,12 +131,12 @@ const COLUMNS = ["permit_id","permit_class","permit_type","permit_subtype","stat
 function groupSpan(md, k){ let start = Infinity, end = 0; for (const c of md.row_groups[k].columns) { const m = c.meta_data; const off = Number(m.dictionary_page_offset ?? m.data_page_offset); start = Math.min(start, off); end = Math.max(end, off + Number(m.total_compressed_size)); } return [start, end]; }
 async function loadRows(){
   const [index, dmeta] = await Promise.all([
-    (await fetch(`data/detail/index_${S.geo}.json`)).json(),
-    (await fetch(`data/detail/meta.json`)).json(),
+    (await fetch(`data/detail/index_${S.geo}.json?v=${V}`)).json(),
+    (await fetch(`data/detail/meta.json?v=${V}`)).json(),
   ]);
   const groups = index[S.id] || [];
   if (!groups.length) return [];
-  const url = "data/detail/permits.parquet", byteLength = dmeta.byte_length, rg = dmeta.row_group, col = `g_${S.geo}`;
+  const url = `data/detail/permits.parquet?v=${V}`, byteLength = dmeta.byte_length, rg = dmeta.row_group, col = `g_${S.geo}`;
   const file = await asyncBufferFromUrl({ url, byteLength });
   const md = await parquetMetadataAsync(file);
   // Each contiguous run of row groups is one range request, parsed from memory.
@@ -212,7 +213,7 @@ async function init(){
   document.getElementById("sub").textContent = `${geoLabel}. Issued permits ${META.years.start}–${META.years.end}; net dwelling units count only permits with a certificate of occupancy and finaled demolitions.`;
   try {
     // Outline of this area, from the geography export.
-    const fc = await (await fetch(`data/geo_${S.geo}.geojson`)).json();
+    const fc = await (await fetch(`data/geo_${S.geo}.geojson?v=${V}`)).json();
     const feat = fc.features.find(f => String(f.properties.id) === S.id);
     const name = feat ? feat.properties.name : S.id;
     document.getElementById("title").textContent = S.geo === "tract" ? `Tract ${name}` : S.geo === "zip" ? `ZIP ${name}` : S.geo === "council_district" ? `Council district ${name}` : name;
