@@ -25,7 +25,7 @@ KEEP = ["n_permits", "n_new_building", "n_adu", "n_solar", "valuation_sum", "du_
 for f in tracts["features"]:
     p = f["properties"]
     slim = {"geoid": p["geoid"], "arealand_km2": p["arealand_km2"]}
-    for cls in ("building", "right_of_way", "electrical"):
+    for cls in ("building", "electrical", "mechanical", "right_of_way"):
         if cls in p:
             slim[cls] = {y: {k: v for k, v in yy.items() if k in KEEP} for y, yy in p[cls].items()}
     if "acs" in p:
