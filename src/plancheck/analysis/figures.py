@@ -268,8 +268,8 @@ def fig_scatter_vs_covariate(
     return _save(fig, name)
 
 
-def fig_geocode_coverage(coverage: pl.DataFrame, ahj_slug: str) -> Path:
-    d = coverage.filter(pl.col("ahj") == ahj_slug)
+def fig_geocode_coverage(coverage: pl.DataFrame, ahj_slug: str, min_year: int = 1990) -> Path:
+    d = coverage.filter((pl.col("ahj") == ahj_slug) & (pl.col("year") >= min_year))
     fams = sorted(d["source_family"].unique().to_list())
     fig, axes = plt.subplots(len(fams), 1, figsize=(9, 2.2 * len(fams)), sharex=True)
     axes = np.atleast_1d(axes)

@@ -128,6 +128,8 @@ def check_permit_id_unique() -> list[Finding]:
 
 
 def check_coord_coverage() -> list[Finding]:
+    """Share of permits without source coordinates, per source and year (>5% flagged,
+    one warning per source listing the affected years)."""
     out: list[Finding] = []
     con = _con()
     if not _has_view(con, "permits_norm"):
@@ -136,25 +138,32 @@ def check_coord_coverage() -> list[Finding]:
         """
         SELECT source_dataset, year, count(*) AS n,
                sum(CASE WHEN lat_src IS NULL THEN 1 ELSE 0 END) AS missing
-        FROM permits_norm WHERE source_family <> 'boe_permits'
+        FROM permits_norm WHERE source_family <> 'boe_permits' AND year > 0
         GROUP BY 1, 2 HAVING n >= 500 ORDER BY 1, 2
         """
     ).fetchall()
+    by_src: dict[str, list[tuple[int, float]]] = {}
     for src, year, n, missing in rows:
-        share = missing / n
-        if share > 0.05:
-            out.append(
-                Finding(
-                    "coord_coverage",
-                    "warning",
-                    src,
-                    f"{year}: {share:.1%} of {n:,} permits lack source coordinates",
-                )
+        if missing / n > 0.05:
+            by_src.setdefault(src, []).append((year, missing / n))
+    for src, years in by_src.items():
+        out.append(
+            Finding(
+                "coord_coverage",
+                "warning",
+                src,
+                f">5% of permits lack source coordinates in {len(years)} year(s) "
+                f"{years[0][0]}–{years[-1][0]} (max {max(s for _, s in years):.0%}); "
+                "these rows go through the locator chain",
             )
+        )
     if not out:
         out.append(
             Finding(
-                "coord_coverage", "info", None, "no source-year with >5% missing source coordinates"
+                "coord_coverage",
+                "info",
+                None,
+                "no source-year with >5% missing source coordinates",
             )
         )
     con.close()
@@ -205,6 +214,12 @@ def check_geocode_rates() -> list[Finding]:
 
 
 def check_admin_disagreement() -> list[Finding]:
+    """Spatial join vs the source's own tract / council-district field, by year.
+
+    Old records carry the tract and district vintage in force when they were processed, so
+    disagreement is expected to step down at each redistricting (2012, 2022) and at the
+    2020 tract release; it is reported as one warning per field listing the years above
+    10%, plus the full series as info."""
     out: list[Finding] = []
     con = _con()
     if not _has_view(con, "permits"):
@@ -217,32 +232,27 @@ def check_admin_disagreement() -> list[Finding]:
             f"""
             SELECT year, count(*) AS n, sum(CASE WHEN {flag} THEN 1 ELSE 0 END) AS d
             FROM permits WHERE {flag} IS NOT NULL AND lat IS NOT NULL
-              AND source_family <> 'boe_permits'
+              AND source_family <> 'boe_permits' AND year > 0
             GROUP BY 1 HAVING n >= 1000 ORDER BY 1
             """
         ).fetchall()
-        for year, n, d in rows:
-            share = d / n
-            if share > 0.10:
-                out.append(
-                    Finding(
-                        "admin_disagreement",
-                        "warning",
-                        str(year),
-                        f"{label}: spatial join disagrees with the source field on "
-                        f"{share:.1%} of {n:,} located permits",
-                    )
-                )
-        if rows:
-            worst = max(rows, key=lambda r: r[2] / r[1])
+        if not rows:
+            continue
+        high = [(y, d / n) for y, n, d in rows if d / n > 0.10]
+        if high:
             out.append(
                 Finding(
                     "admin_disagreement",
-                    "info",
-                    None,
-                    f"{label}: worst year {worst[0]} at {worst[2] / worst[1]:.1%} disagreement",
+                    "warning",
+                    label,
+                    f"spatial join disagrees with the source field on >10% of located permits "
+                    f"in {len(high)} year(s): {high[0][0]}–{high[-1][0]} "
+                    f"(max {max(s for _, s in high):.0%}); expected where the source vintage "
+                    "predates the current boundaries — see known_issues",
                 )
             )
+        series = ", ".join(f"{y}: {d / n:.1%}" for y, n, d in rows[-8:])
+        out.append(Finding("admin_disagreement", "info", label, f"recent years — {series}"))
     con.close()
     return out
 

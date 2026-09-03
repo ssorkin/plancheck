@@ -118,7 +118,8 @@ ahjs:
       boe_geocoder:
         kind: arcgis_mapserver
         url: https://maps.lacity.org/arcgis/rest/services/Permits/BOE_Permits_Geocoder/MapServer
-        layer_name_regex: " (Points|Lines|Polygons)$"
+        # Only the permit sublayers; the service also hosts unrelated "Sidewalk Repairs" layers.
+        layer_name_regex: "^(Above Ground Facilities|A Permits|B Permits( Construction| Design)?|Claims for Refunds|Dye Test Certificate|E Permits|Highway Dedication|Planning Case Referral Form|Revocable Permits|S Permits|Sewer Facilities Charges|Storm Drain Permits|Street Furniture|U Permits|Watercourse Permits) (Points|Lines|Polygons)$"
         key_field: RefNo
         out_fields: "ID,GeocodingID,Geotype,RefNo,PermitNo,PermitType,PermitSubType,Location,Active,EnterDate,StartDate,EndDate"
         order_by: ID

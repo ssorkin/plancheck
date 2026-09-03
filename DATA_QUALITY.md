@@ -64,18 +64,45 @@ Every row carries the same REFRESH_TIME and Socrata :updated_at after each weekl
 
 ### admin_disagreement
 
-- 🟡 **2020** census tract: spatial join disagrees with the source field on 15.8% of 51,824 located permits
-- 🟡 **2021** census tract: spatial join disagrees with the source field on 15.4% of 57,337 located permits
-- 🟡 **2022** census tract: spatial join disagrees with the source field on 12.4% of 65,204 located permits
-- ℹ️ census tract: worst year 2020 at 15.8% disagreement
-- ℹ️ council district: worst year 2021 at 8.5% disagreement
+- 🟡 **census tract** spatial join disagrees with the source field on >10% of located permits in 27 year(s): 1996–2022 (max 55%); expected where the source vintage predates the current boundaries — see known_issues
+- 🟡 **council district** spatial join disagrees with the source field on >10% of located permits in 18 year(s): 1996–2013 (max 40%); expected where the source vintage predates the current boundaries — see known_issues
 ### coord_coverage
 
-- ℹ️ no source-year with >5% missing source coordinates
+- 🟡 **ladbs_building_issued_pre2010** >5% of permits lack source coordinates in 4 year(s) 1998–2001 (max 7%); these rows go through the locator chain
+- 🟡 **ladbs_building_submitted_pre2010** >5% of permits lack source coordinates in 7 year(s) 1996–2002 (max 21%); these rows go through the locator chain
+- 🟡 **ladbs_electrical_issued_pre2010** >5% of permits lack source coordinates in 7 year(s) 1996–2002 (max 18%); these rows go through the locator chain
+- 🟡 **ladbs_electrical_submitted_pre2010** >5% of permits lack source coordinates in 8 year(s) 1997–2004 (max 17%); these rows go through the locator chain
+- 🟡 **ladbs_mechanical_issued_pre2010** >5% of permits lack source coordinates in 6 year(s) 1996–2001 (max 19%); these rows go through the locator chain
+- 🟡 **ladbs_mechanical_submitted_pre2010** >5% of permits lack source coordinates in 10 year(s) 1996–2005 (max 31%); these rows go through the locator chain
+### admin_disagreement
+
+- ℹ️ **census tract** recent years — 2019: 18.0%, 2020: 16.8%, 2021: 16.8%, 2022: 11.8%, 2023: 2.2%, 2024: 1.4%, 2025: 1.0%, 2026: 0.8%
+- ℹ️ **council district** recent years — 2019: 8.5%, 2020: 8.0%, 2021: 8.0%, 2022: 1.6%, 2023: 0.8%, 2024: 0.6%, 2025: 0.5%, 2026: 0.3%
+### date_sanity
+
+- ℹ️ 123 permits issued before their submitted date
 ### geocode_rates
 
-- ℹ️ unlocated by reason: unmatched=607, out_of_bbox=3
-- ℹ️ **ladbs_building_issued_2020** 99.9% located: source=409,009, none=610
+- ℹ️ unlocated by reason: unmatched=21,942, low_score=11,398
+- ℹ️ **boe_permits** 98.1% located: boe_point=475,227, cams=110,002, boe_line_centroid=36,357, none=11,989, centerline=1,400, boe_polygon_centroid=779
+- ℹ️ **ladbs_building_issued_2010** 100.0% located: source=532,656, cams=359, none=244, centerline=108
+- ℹ️ **ladbs_building_issued_2020** 100.0% located: source=409,009, cams=409, none=175, centerline=26
+- ℹ️ **ladbs_building_issued_pre2010** 99.5% located: source=618,053, cams=18,487, none=2,939, centerline=463
+- ℹ️ **ladbs_building_submitted_2010** 99.8% located: source=426,290, none=1,065, cams=448, centerline=93
+- ℹ️ **ladbs_building_submitted_2020** 99.9% located: source=302,776, none=431, cams=385, centerline=25
+- ℹ️ **ladbs_building_submitted_pre2010** 99.2% located: source=327,013, cams=12,244, none=2,724, centerline=341
+- ℹ️ **ladbs_electrical_issued_2010** 100.0% located: source=390,801, cams=267, none=163, centerline=76
+- ℹ️ **ladbs_electrical_issued_2020** 100.0% located: source=357,178, cams=316, none=57, centerline=37
+- ℹ️ **ladbs_electrical_issued_pre2010** 98.6% located: source=341,938, cams=13,678, none=4,957, centerline=479
+- ℹ️ **ladbs_electrical_submitted_2010** 99.8% located: source=77,398, cams=189, none=176, centerline=16
+- ℹ️ **ladbs_electrical_submitted_2020** 99.9% located: source=77,670, cams=145, none=57, centerline=20
+- ℹ️ **ladbs_electrical_submitted_pre2010** 98.6% located: source=36,259, cams=1,837, none=531, centerline=42
+- ℹ️ **ladbs_mechanical_issued_2010** 99.9% located: source=502,213, cams=587, none=252, centerline=229
+- ℹ️ **ladbs_mechanical_issued_2020** 100.0% located: source=294,973, cams=310, none=120, centerline=29
+- ℹ️ **ladbs_mechanical_issued_pre2010** 99.0% located: source=555,338, cams=21,863, none=5,881, centerline=537
+- ℹ️ **ladbs_mechanical_submitted_2010** 99.7% located: source=88,190, cams=444, none=310, centerline=210
+- ℹ️ **ladbs_mechanical_submitted_2020** 99.8% located: source=64,354, cams=190, none=102, centerline=16
+- ℹ️ **ladbs_mechanical_submitted_pre2010** 97.9% located: source=49,221, cams=4,197, none=1,167, centerline=189
 ### manifest
 
 - ℹ️ all manifest entries present and sized
@@ -84,12 +111,30 @@ Every row carries the same REFRESH_TIME and Socrata :updated_at after each weekl
 - ℹ️ permit_id unique within every source
 ### row_counts
 
+- ℹ️ **boe_permits** 635,754 rows = portal count
+- ℹ️ **ladbs_building_issued_2010** 533,367 rows = portal count
 - ℹ️ **ladbs_building_issued_2020** 409,619 rows = portal count
+- ℹ️ **ladbs_building_issued_pre2010** 639,942 rows = portal count
+- ℹ️ **ladbs_building_submitted_2010** 427,896 rows = portal count
+- ℹ️ **ladbs_building_submitted_2020** 303,617 rows = portal count
+- ℹ️ **ladbs_building_submitted_pre2010** 342,322 rows = portal count
+- ℹ️ **ladbs_electrical_issued_2010** 391,307 rows = portal count
+- ℹ️ **ladbs_electrical_issued_2020** 357,588 rows = portal count
+- ℹ️ **ladbs_electrical_issued_pre2010** 361,052 rows = portal count
+- ℹ️ **ladbs_electrical_submitted_2010** 77,779 rows = portal count
+- ℹ️ **ladbs_electrical_submitted_2020** 77,892 rows = portal count
+- ℹ️ **ladbs_electrical_submitted_pre2010** 38,669 rows = portal count
+- ℹ️ **ladbs_mechanical_issued_2010** 503,281 rows = portal count
+- ℹ️ **ladbs_mechanical_issued_2020** 295,432 rows = portal count
+- ℹ️ **ladbs_mechanical_issued_pre2010** 583,619 rows = portal count
+- ℹ️ **ladbs_mechanical_submitted_2010** 89,154 rows = portal count
+- ℹ️ **ladbs_mechanical_submitted_2020** 64,662 rows = portal count
+- ℹ️ **ladbs_mechanical_submitted_pre2010** 54,774 rows = portal count
 ### valuation_outliers
 
 - ℹ️ largest declared valuations (kept as published)
   - 1,966,896,355 — 25014-10000-03198 (ladbs_building_issued_2020) 500 WORLD WAY
-  - 554,147,741 — 21014-10000-03646 (ladbs_building_issued_2020) 400 WORLD WAY
-  - 375,000,000 — 24010-10000-03878 (ladbs_building_issued_2020) 1301 S FIGUEROA ST
-  - 333,103,645 — 25014-10002-03198 (ladbs_building_issued_2020) 500 WORLD WAY
-  - 300,000,000 — 17010-10000-03447 (ladbs_building_issued_2020) 1950 S AVENUE OF THE STARS
+  - 1,966,896,355 — 25014-10000-03198 (ladbs_building_submitted_2020) 500 WORLD WAY
+  - 1,547,436,478 — 25010-10000-02100 (ladbs_building_submitted_2020) 6100 N TOPANGA CANYON BLVD
+  - 1,332,414,581 — 25014-10001-03198 (ladbs_building_submitted_2020) 500 WORLD WAY
+  - 992,724,830 — 26010-10000-01776 (ladbs_building_submitted_2020) 6400 N CANOGA AVE

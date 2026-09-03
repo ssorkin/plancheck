@@ -1,0 +1,197 @@
+<title>LA Permit Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>/*__LEAFLET_CSS__*/</style>
+<style>
+:root {
+  color-scheme: light;
+  --ground: #f5f6f8; --sheet: #ffffff; --ink: #14181f; --ink-2: #545b67; --ink-3: #8a919c;
+  --rule: #d9dde3; --rule-strong: #b9bfc8; --accent: #2a78d6; --accent-ink: #1c5cab;
+  --neg: #e34948; --mid: #eceef1; --tip: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #131619; --sheet: #1a1e23; --ink: #eef0f3; --ink-2: #aab1bb; --ink-3: #737b86;
+    --rule: #2b3139; --rule-strong: #3d444e; --accent: #3987e5; --accent-ink: #86b6ef;
+    --neg: #e66767; --mid: #2a2f36; --tip: #22272d;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #131619; --sheet: #1a1e23; --ink: #eef0f3; --ink-2: #aab1bb; --ink-3: #737b86;
+  --rule: #2b3139; --rule-strong: #3d444e; --accent: #3987e5; --accent-ink: #86b6ef;
+  --neg: #e66767; --mid: #2a2f36; --tip: #22272d;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 15px/1.5 "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif; }
+.sheet { max-width: 1320px; margin: 0 auto; padding: 20px 20px 40px; display: grid; gap: 16px; }
+.titleblock { display: grid; grid-template-columns: 1fr auto; gap: 8px 24px; align-items: end; border-top: 3px solid var(--ink); border-bottom: 1px solid var(--rule-strong); padding: 14px 0 12px; }
+.titleblock h1 { margin: 0; font: 700 44px/1 "Barlow Condensed", "Arial Narrow", sans-serif; letter-spacing: .01em; text-wrap: balance; }
+.titleblock .sub { color: var(--ink-2); max-width: 62ch; margin: 6px 0 0; }
+.stamps { display: grid; grid-template-columns: repeat(3, auto); gap: 0 22px; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 12px; color: var(--ink-2); }
+.stamps b { display: block; font: 600 26px/1.1 "Barlow Condensed", "Arial Narrow", sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+.stamps span { text-transform: uppercase; letter-spacing: .08em; font-size: 10.5px; color: var(--ink-3); }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .titleblock { grid-template-columns: 1fr; } }
+.mapwrap { position: relative; background: var(--sheet); border: 1px solid var(--rule); min-height: 560px; height: 78vh; max-height: 900px; }
+#map { position: absolute; inset: 0; background: var(--sheet); }
+aside { display: grid; gap: 14px; align-content: start; }
+.panel { background: var(--sheet); border: 1px solid var(--rule); padding: 14px 16px; }
+.panel h2 { margin: 0 0 10px; font: 600 13px/1 "IBM Plex Mono", ui-monospace, monospace; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-3); }
+.controls { display: grid; gap: 10px; }
+label { display: grid; gap: 4px; font-size: 12.5px; color: var(--ink-2); }
+select, input[type=range] { font: inherit; color: var(--ink); background: var(--ground); border: 1px solid var(--rule-strong); padding: 6px 8px; border-radius: 3px; width: 100%; }
+input[type=range] { padding: 0; accent-color: var(--accent); }
+select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.yr { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.yrlbl { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; color: var(--ink); }
+.check { display: flex; align-items: center; gap: 8px; color: var(--ink); font-size: 13px; }
+.check input { accent-color: var(--accent); width: 15px; height: 15px; margin: 0; }
+.legend { display: grid; gap: 3px; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.legend .row { display: grid; grid-template-columns: 18px 1fr; gap: 8px; align-items: center; }
+.legend .sw { height: 12px; border: 1px solid var(--rule); }
+.legend .cap { color: var(--ink); font-family: "IBM Plex Sans", sans-serif; font-size: 12.5px; margin-bottom: 4px; }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart text { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 10px; fill: var(--ink-3); }
+.chart .lbl { font-family: "IBM Plex Sans", sans-serif; font-size: 11px; fill: var(--ink-2); }
+.chart .grid line { stroke: var(--rule); stroke-width: 1; }
+.chart .axis { stroke: var(--rule-strong); }
+.notes { font-size: 12.5px; color: var(--ink-2); max-width: 70ch; }
+.notes p { margin: 0 0 6px; }
+.leaflet-container { font: inherit; }
+.leaflet-control-attribution { display: none; }
+.leaflet-control-zoom a { background: var(--sheet); color: var(--ink); border-color: var(--rule-strong) !important; }
+.leaflet-tooltip.pc { background: var(--tip); color: var(--ink); border: 1px solid var(--rule-strong); border-radius: 2px; box-shadow: none; font: 12px/1.45 "IBM Plex Sans", sans-serif; padding: 6px 8px; }
+.leaflet-tooltip.pc b { font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 500; }
+.leaflet-tooltip.pc .m { color: var(--ink-2); }
+.leaflet-tooltip-top.pc:before { border-top-color: var(--rule-strong); }
+@media (prefers-reduced-motion: no-preference) { .leaflet-interactive { transition: fill-opacity .15s; } }
+</style>
+<div class="sheet">
+  <div class="titleblock">
+    <div>
+      <h1>LA Permit Atlas</h1>
+      <p class="sub">Every building, trade and right-of-way permit the City of Los Angeles publishes, located and summed by 2020 census tract. Issued permits only; each tract shaded by the chosen measure over the chosen years.</p>
+    </div>
+    <div class="stamps">
+      <div><span>Permits located</span><b id="st-loc">—</b></div>
+      <div><span>Of records</span><b id="st-tot">—</b></div>
+      <div><span>Data as of</span><b id="st-date">—</b></div>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="mapwrap"><div id="map"></div></div>
+    <aside>
+      <div class="panel">
+        <h2>Measure</h2>
+        <div class="controls">
+          <label>Permit class <select id="cls"><option value="building">Building</option><option value="electrical">Electrical</option><option value="right_of_way">Right-of-way (Bureau of Engineering)</option></select></label>
+          <label>Metric <select id="metric"></select></label>
+          <div class="yr">
+            <label>From <span class="yrlbl" id="yr0"></span><input id="y0" type="range"></label>
+            <label>To <span class="yrlbl" id="yr1"></span><input id="y1" type="range"></label>
+          </div>
+          <label class="check"><input id="perkm2" type="checkbox" checked> Per km² of land</label>
+        </div>
+      </div>
+      <div class="panel"><h2>Legend</h2><div class="legend" id="legend"></div></div>
+      <div class="panel chart"><h2>Permits issued per year</h2><div id="chart"></div></div>
+      <div class="panel notes" id="notes"></div>
+    </aside>
+  </div>
+</div>
+<script>
+const D = /*__DATA__*/null;
+const METRICS = {n_permits:"Permits", n_new_building:"New buildings", n_adu:"ADU permits", n_solar:"Solar permits", valuation_sum:"Declared valuation", du_net:"Net dwelling units"};
+const RAMP = ["#cde2fb","#b7d3f6","#9ec5f4","#86b6ef","#6da7ec","#5598e7","#3987e5","#2a78d6","#256abf","#1c5cab","#184f95","#104281","#0d366b"];
+const DIV = ["#0d366b","#256abf","#6da7ec","#cde2fb","#eceef1","#f5b8b8","#ee8080","#e34948","#8f1f1f"];
+const CLASS_COLOR = {building:"#2a78d6", electrical:"#eb6834", mechanical:"#1baf7a", right_of_way:"#eda100"};
+const CLASS_LABEL = {building:"Building", electrical:"Electrical", mechanical:"Mechanical", right_of_way:"Right-of-way"};
+const S = {cls:"building", metric:"n_permits", y0:D.years.start, y1:D.years.end, perkm2:true};
+const fmt = (v, m) => v==null ? "—" : (m==="valuation_sum" ? "$"+Math.round(v).toLocaleString() : Math.round(v).toLocaleString());
+
+document.getElementById("st-loc").textContent = (100*D.located/D.total).toFixed(1)+"%";
+document.getElementById("st-tot").textContent = (D.total/1e6).toFixed(2)+" M";
+document.getElementById("st-date").textContent = D.generated;
+
+const map = L.map("map", {preferCanvas:true, zoomControl:true, attributionControl:false});
+L.geoJSON(D.city, {style:{color:"#8a919c", weight:1.4, fill:false}}).addTo(map);
+const cdLayer = L.geoJSON(D.cds, {style:{color:"#8a919c", weight:0.7, dashArray:"3 3", fill:false}});
+map.fitBounds(L.geoJSON(D.city).getBounds());
+let layer = null;
+
+function value(p){
+  const c = p[S.cls]; if(!c) return null;
+  let v = 0, any = false;
+  for (let y = S.y0; y <= S.y1; y++){ const yy = c[String(y)]; if (yy && yy[S.metric]!=null){ v += yy[S.metric]; any = true; } }
+  if (!any) return null;
+  if (S.perkm2 && p.arealand_km2 > 0) v = v / p.arealand_km2;
+  return v;
+}
+function quantiles(vals, n){ const s = vals.filter(v => v!=null && isFinite(v)).sort((a,b)=>a-b); if (!s.length) return []; return Array.from({length:n-1}, (_,i) => s[Math.floor((i+1)*s.length/n)]); }
+function render(){
+  const div = S.metric === "du_net";
+  const vals = D.tracts.features.map(f => value(f.properties));
+  let breaks, colorOf;
+  if (div){
+    const abs = vals.map(v => v==null ? null : Math.abs(v));
+    const lim = quantiles(abs, 50)[47] || 1;
+    colorOf = v => v==null ? null : DIV[Math.round((Math.max(-1, Math.min(1, v/lim)) + 1) / 2 * (DIV.length-1))];
+    breaks = [-lim, -lim/2, 0, lim/2, lim];
+  } else {
+    breaks = quantiles(vals, RAMP.length);
+    colorOf = v => { if (v==null) return null; let i = 0; while (i < breaks.length && v > breaks[i]) i++; return RAMP[Math.min(i, RAMP.length-1)]; };
+  }
+  if (layer) layer.remove();
+  layer = L.geoJSON(D.tracts, {
+    style: f => { const c = colorOf(value(f.properties)); return {weight:0.5, color:"#ffffff", opacity:0.9, fillColor: c || "#ffffff", fillOpacity: c ? 0.88 : 0}; },
+    onEachFeature: (f, l) => l.on("mouseover", () => {
+      const p = f.properties, v = value(p);
+      const acs = p.acs ? `<div class="m">income ${p.acs.median_hh_income ? "$"+p.acs.median_hh_income.toLocaleString() : "—"} · renters ${p.acs.renter_share!=null ? Math.round(p.acs.renter_share*100)+"%" : "—"} · built ${p.acs.median_year_built || "—"}</div>` : "";
+      l.bindTooltip(`<b>Tract ${p.geoid.slice(5,9)}.${p.geoid.slice(9)}</b><div>${METRICS[S.metric]}${S.perkm2 ? " per km²" : ""}, ${S.y0}–${S.y1}: <b>${fmt(v, S.metric)}</b></div>${acs}`, {className:"pc", sticky:true, direction:"top"}).openTooltip();
+    })
+  }).addTo(map);
+  cdLayer.addTo(map); cdLayer.bringToFront();
+  const lg = document.getElementById("legend");
+  const cap = `<div class="cap">${METRICS[S.metric]}${S.perkm2 ? " per km²" : ""}, ${S.y0}–${S.y1}</div>`;
+  const rows = div
+    ? DIV.map((c,i) => `<div class="row"><span class="sw" style="background:${c}"></span><span>${i===0 ? "≤ "+fmt(breaks[0]) : i===DIV.length-1 ? "≥ "+fmt(breaks[4]) : i===4 ? "0" : ""}</span></div>`)
+    : RAMP.map((c,i) => `<div class="row"><span class="sw" style="background:${c}"></span><span>${i < breaks.length ? "≤ "+fmt(breaks[i], S.metric) : "> "+fmt(breaks[breaks.length-1], S.metric)}</span></div>`);
+  lg.innerHTML = cap + rows.join("") + `<div class="row"><span class="sw" style="background:transparent"></span><span>no permits</span></div>`;
+}
+function chart(){
+  const rows = D.series.filter(r => r.year >= D.years.start && r.year <= D.years.end);
+  const classes = ["building","electrical","mechanical","right_of_way"].filter(c => rows.some(r => r.permit_class===c));
+  const years = [...new Set(rows.map(r => r.year))].sort();
+  const W = 300, H = 170, L = 34, R = 8, T = 10, B = 22;
+  const maxv = Math.max(...rows.map(r => r.n_permits));
+  const x = y => L + (y - years[0]) / (years[years.length-1] - years[0]) * (W - L - R);
+  const yy = v => T + (1 - v / maxv) * (H - T - B);
+  const ticks = [0, 25000, 50000, 75000].filter(t => t <= maxv * 1.05);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Permits issued per year by class"><g class="grid">`;
+  for (const t of ticks) s += `<line x1="${L}" x2="${W-R}" y1="${yy(t)}" y2="${yy(t)}"/><text x="${L-4}" y="${yy(t)+3}" text-anchor="end">${t/1000}k</text>`;
+  s += `</g><line class="axis" x1="${L}" x2="${W-R}" y1="${yy(0)}" y2="${yy(0)}"/>`;
+  for (const yr of years) if ((yr - years[0]) % 4 === 0 || yr === years[years.length-1]) s += `<text x="${x(yr)}" y="${H-6}" text-anchor="middle">${yr}</text>`;
+  for (const c of classes){
+    const pts = years.map(yr => { const r = rows.find(q => q.year===yr && q.permit_class===c); return r ? [x(yr), yy(r.n_permits)] : null; }).filter(Boolean);
+    s += `<polyline fill="none" stroke="${CLASS_COLOR[c]}" stroke-width="2" stroke-linejoin="round" points="${pts.map(p=>p.join(",")).join(" ")}"/>`;
+    const last = pts[pts.length-1];
+    s += `<circle cx="${last[0]}" cy="${last[1]}" r="2.5" fill="${CLASS_COLOR[c]}"/>`;
+  }
+  s += `</svg>`;
+  const leg = classes.map(c => `<span style="display:inline-flex;align-items:center;gap:6px;margin:6px 12px 0 0;font-size:12px;color:var(--ink-2)"><span style="width:14px;height:3px;background:${CLASS_COLOR[c]};display:inline-block"></span>${CLASS_LABEL[c]}</span>`).join("");
+  document.getElementById("chart").innerHTML = s + leg + `<div style="font-size:11px;color:var(--ink-3);margin-top:6px">${D.years.end} is partial.</div>`;
+}
+document.getElementById("notes").innerHTML = `<p><strong>How permits were located.</strong> ${(100*D.located/D.total).toFixed(1)}% of ${D.total.toLocaleString()} records: the department's own coordinates where published, the city's BOE geometry service by reference number, then the county CAMS and city centerline locators (score ≥ 90, match type checked).</p><p>Sources: LADBS and Bureau of Engineering tables on data.lacity.org; boundaries from the LA GeoHub and maps.lacity.org; tracts and demographics from the U.S. Census Bureau (ACS 2020–2024). Dashed lines are council districts. Tracts with no permits are unshaded.</p><p>Built with <a href="https://github.com/ssorkin/plancheck" style="color:var(--accent-ink)">plancheck</a>.</p>`;
+
+const ms = document.getElementById("metric");
+for (const m of Object.keys(METRICS)) { const o = document.createElement("option"); o.value = m; o.textContent = METRICS[m]; ms.appendChild(o); }
+for (const id of ["y0","y1"]) { const el = document.getElementById(id); el.min = D.years.start; el.max = D.years.end; el.value = S[id];
+  el.oninput = () => { S[id] = +el.value; if (S.y0 > S.y1) { if (id==="y0") S.y1 = S.y0; else S.y0 = S.y1; } document.getElementById("y0").value = S.y0; document.getElementById("y1").value = S.y1; document.getElementById("yr0").textContent = S.y0; document.getElementById("yr1").textContent = S.y1; render(); }; }
+document.getElementById("yr0").textContent = S.y0; document.getElementById("yr1").textContent = S.y1;
+for (const id of ["cls","metric"]) { const el = document.getElementById(id); el.value = S[id]; el.onchange = () => { S[id] = el.value; render(); }; }
+document.getElementById("perkm2").onchange = e => { S.perkm2 = e.target.checked; render(); };
+chart(); render();
+</script>
