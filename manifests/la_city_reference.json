@@ -50,6 +50,74 @@
       "out_fields": "OBJECTID,NAME,District,District_Name,Effective,Revised"
     }
   },
+  "lausd_codes_e.geojsonl": {
+    "dataset": "la_city_reference",
+    "filename": "lausd_codes_e.geojsonl",
+    "url": "https://services3.arcgis.com/9QBcCnjxM5EBVdGe/ArcGIS/rest/services/Boundaries_and_Sites/FeatureServer/4/query",
+    "sha256": "501ff868050dbd59c1a41abc130fadc10ed82c74cadc673e321d9dcfdf5b538a",
+    "size": 126282,
+    "downloaded_at": "2026-09-03T21:54:24+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "742 features, layer 'Atte1112_Codes'",
+    "extra": {
+      "count": 742,
+      "layer_name": "Atte1112_Codes",
+      "where": "1=1",
+      "out_fields": "OBJECTID,SCHOOL_ID,NAME,LO_GRD,HI_GRD,CDS,EKEY_5S"
+    }
+  },
+  "lausd_codes_h.geojsonl": {
+    "dataset": "la_city_reference",
+    "filename": "lausd_codes_h.geojsonl",
+    "url": "https://services3.arcgis.com/9QBcCnjxM5EBVdGe/ArcGIS/rest/services/Boundaries_and_Sites/FeatureServer/6/query",
+    "sha256": "8ad717a49a0d896b86342f4966d843caa1ad81317eb616dc1d6e2c9f36d54756",
+    "size": 41017,
+    "downloaded_at": "2026-09-03T21:54:25+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "239 features, layer 'Atth1112_Codes'",
+    "extra": {
+      "count": 239,
+      "layer_name": "Atth1112_Codes",
+      "where": "1=1",
+      "out_fields": "OBJECTID,SCHOOL_ID,NAME,LO_GRD,HI_GRD,CDS,HKEY_5S"
+    }
+  },
+  "lausd_codes_m.geojsonl": {
+    "dataset": "la_city_reference",
+    "filename": "lausd_codes_m.geojsonl",
+    "url": "https://services3.arcgis.com/9QBcCnjxM5EBVdGe/ArcGIS/rest/services/Boundaries_and_Sites/FeatureServer/5/query",
+    "sha256": "f11d443816ed7e9016ba4066e8c2e53a60c15b72e89605b4dbb42b5402a76687",
+    "size": 43335,
+    "downloaded_at": "2026-09-03T21:54:24+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "257 features, layer 'Attm1112_Codes'",
+    "extra": {
+      "count": 257,
+      "layer_name": "Attm1112_Codes",
+      "where": "1=1",
+      "out_fields": "OBJECTID,SCHOOL_ID,NAME,LO_GRD,HI_GRD,CDS,MKEY_5S"
+    }
+  },
+  "lausd_mp25.geojsonl": {
+    "dataset": "la_city_reference",
+    "filename": "lausd_mp25.geojsonl",
+    "url": "https://services3.arcgis.com/9QBcCnjxM5EBVdGe/ArcGIS/rest/services/MP25/FeatureServer/0/query",
+    "sha256": "226a3267c6d709a7bf91a5455ed8ab3e2657e113eb4e34800f290ed1fc7a6ace",
+    "size": 2661156,
+    "downloaded_at": "2026-09-03T21:54:23+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "985 features, layer 'MP25'",
+    "extra": {
+      "count": 985,
+      "layer_name": "MP25",
+      "where": "1=1",
+      "out_fields": "FID,P_KEY,E_KEY,M_KEY,H_KEY"
+    }
+  },
   "neighborhood_councils.geojsonl": {
     "dataset": "la_city_reference",
     "filename": "neighborhood_councils.geojsonl",
@@ -65,6 +133,40 @@
       "layer_name": "Neighborhood_Council_Boundaries_(2018)",
       "where": "1=1",
       "out_fields": "FID,Name"
+    }
+  },
+  "neighborhoods.geojsonl": {
+    "dataset": "la_city_reference",
+    "filename": "neighborhoods.geojsonl",
+    "url": "https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Neighborhoods/FeatureServer/0/query",
+    "sha256": "03ede26d1b12fa8a4c40c4644433b3166011dd926d9ba6674a8c867a2afc6dd9",
+    "size": 521356,
+    "downloaded_at": "2026-09-03T21:54:16+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "114 features, layer 'Neighborhoods'",
+    "extra": {
+      "count": 114,
+      "layer_name": "Neighborhoods",
+      "where": "1=1",
+      "out_fields": "OBJECTID,name"
+    }
+  },
+  "zip_codes.geojsonl": {
+    "dataset": "la_city_reference",
+    "filename": "zip_codes.geojsonl",
+    "url": "https://maps.lacity.org/arcgis/rest/services/Mapping/Boundaries/MapServer/6/query",
+    "sha256": "d0fa0b4dd2394c31b134e372d88dfc3722f4d5549f844198dd764569e7fdcee4",
+    "size": 10309769,
+    "downloaded_at": "2026-09-03T21:54:21+00:00",
+    "etag": "",
+    "last_modified": "",
+    "note": "311 features, layer 'Zip Codes (LA County)'",
+    "extra": {
+      "count": 311,
+      "layer_name": "Zip Codes (LA County)",
+      "where": "1=1",
+      "out_fields": "OBJECTID,ZIPCODE,ZIP"
     }
   }
 }

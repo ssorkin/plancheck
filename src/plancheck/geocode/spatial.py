@@ -97,6 +97,26 @@ def enrich(located: pl.DataFrame, ahj) -> pl.DataFrame:
             cols[col] = point_in_polygon(lat, lon, ref, "id")
             names = dict(zip(ref["id"].to_list(), ref["name"].to_list(), strict=True))
             cols[col + "_name"] = [names.get(x) if x is not None else None for x in cols[col]]
+    # Any other polygon reference layer (neighborhoods, zip codes, LAUSD attendance areas …)
+    # joins generically as <layer>_id; derived dissolve layers are declared in the source's
+    # `dissolve` block.
+    handled = {
+        "council_districts",
+        "community_plan_areas",
+        "neighborhood_councils",
+        "city_boundary",
+    }
+    generic = []
+    for name, spec in ahj.reference.items():
+        if spec.get("geometry", True) is False or spec.get("dissolve"):
+            generic += list(spec.get("dissolve") or {})
+            continue
+        if name not in handled:
+            generic.append(name)
+    for name in generic:
+        ref = load_layer(ahj.slug, name)
+        if ref is not None:
+            cols[f"{name}_id"] = point_in_polygon(lat, lon, ref, "id")
     city = load_layer(ahj.slug, "city_boundary")
     if city is not None:
         cols["in_city"] = [x is not None for x in point_in_polygon(lat, lon, city, "id")]

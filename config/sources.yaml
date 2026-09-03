@@ -151,6 +151,55 @@ ahjs:
         name_field: city
         out_fields: "objectid,city"
         order_by: objectid
+      # City GeoHub neighborhood set (114 areas; the LA Times-derived boundaries the city republishes).
+      neighborhoods:
+        url: https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Neighborhoods/FeatureServer/0
+        id_field: OBJECTID
+        name_field: name
+        out_fields: "OBJECTID,name"
+        order_by: OBJECTID
+        label: Neighborhoods
+      # ZIP code polygons as served by the city's own map service (LA County parcel-based zips).
+      zip_codes:
+        url: https://maps.lacity.org/arcgis/rest/services/Mapping/Boundaries/MapServer/6
+        id_field: ZIPCODE
+        name_field: ZIPCODE
+        out_fields: "OBJECTID,ZIPCODE,ZIP"
+        order_by: OBJECTID
+        label: ZIP codes
+      # LAUSD attendance-area partition (MP25). Each polygon carries the elementary /
+      # middle / high school keys; ingest dissolves it into one layer per level.
+      lausd_mp25:
+        url: https://services3.arcgis.com/9QBcCnjxM5EBVdGe/ArcGIS/rest/services/MP25/FeatureServer/0
+        id_field: P_KEY
+        name_field: P_KEY
+        out_fields: "FID,P_KEY,E_KEY,M_KEY,H_KEY"
+        order_by: FID
+        dissolve:
+          lausd_elementary: {key_field: E_KEY, codes: lausd_codes_e, label: Elementary attendance areas}
+          lausd_middle: {key_field: M_KEY, codes: lausd_codes_m, label: Middle school attendance areas}
+          lausd_high: {key_field: H_KEY, codes: lausd_codes_h, label: High school attendance areas}
+      lausd_codes_e:
+        url: https://services3.arcgis.com/9QBcCnjxM5EBVdGe/ArcGIS/rest/services/Boundaries_and_Sites/FeatureServer/4
+        id_field: EKEY_5S
+        name_field: NAME
+        out_fields: "OBJECTID,SCHOOL_ID,NAME,LO_GRD,HI_GRD,CDS,EKEY_5S"
+        order_by: OBJECTID
+        geometry: false
+      lausd_codes_m:
+        url: https://services3.arcgis.com/9QBcCnjxM5EBVdGe/ArcGIS/rest/services/Boundaries_and_Sites/FeatureServer/5
+        id_field: MKEY_5S
+        name_field: NAME
+        out_fields: "OBJECTID,SCHOOL_ID,NAME,LO_GRD,HI_GRD,CDS,MKEY_5S"
+        order_by: OBJECTID
+        geometry: false
+      lausd_codes_h:
+        url: https://services3.arcgis.com/9QBcCnjxM5EBVdGe/ArcGIS/rest/services/Boundaries_and_Sites/FeatureServer/6
+        id_field: HKEY_5S
+        name_field: NAME
+        out_fields: "OBJECTID,SCHOOL_ID,NAME,LO_GRD,HI_GRD,CDS,HKEY_5S"
+        order_by: OBJECTID
+        geometry: false
 
     # Covariate layers for the relationship analyses (joined at geocode time).
     covariates:

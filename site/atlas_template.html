@@ -75,7 +75,7 @@ select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px s
   <div class="titleblock">
     <div>
       <h1>LA Permit Atlas</h1>
-      <p class="sub">Every building, trade and right-of-way permit the City of Los Angeles publishes, located and summed by 2020 census tract. Issued permits only; each tract shaded by the chosen measure over the chosen years.</p>
+      <p class="sub">Every building, trade and right-of-way permit the City of Los Angeles publishes, located and summed by census tract, school attendance area, neighborhood, council district or ZIP code. Issued permits only; each area shaded by the chosen measure over the chosen years.</p>
     </div>
     <div class="stamps">
       <div><span>Permits located</span><b id="st-loc">—</b></div>
@@ -90,6 +90,7 @@ select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px s
       <div class="panel">
         <h2>Measure</h2>
         <div class="controls">
+          <label>Areas <select id="geo"></select></label>
           <label>Permit class <select id="cls"><option value="building">Building</option><option value="electrical">Electrical</option><option value="mechanical">Mechanical (plumbing, HVAC, sprinklers, elevators)</option><option value="right_of_way">Right-of-way (Bureau of Engineering)</option></select></label>
           <label>Metric <select id="metric"></select></label>
           <div class="yr">
@@ -112,11 +113,12 @@ const RAMP = ["#cde2fb","#b7d3f6","#9ec5f4","#86b6ef","#6da7ec","#5598e7","#3987
 const DIV = ["#0d366b","#256abf","#6da7ec","#cde2fb","#eceef1","#f5b8b8","#ee8080","#e34948","#8f1f1f"];
 const CLASS_COLOR = {building:"#2a78d6", electrical:"#eb6834", mechanical:"#1baf7a", right_of_way:"#eda100"};
 const CLASS_LABEL = {building:"Building", electrical:"Electrical", mechanical:"Mechanical", right_of_way:"Right-of-way"};
-const S = {cls:"building", metric:"n_permits", y0:D.years.start, y1:D.years.end, perkm2:true};
+const S = {geo:"tract", cls:"building", metric:"n_permits", y0:D.years.start, y1:D.years.end, perkm2:true};
+const FEATS = () => D.geos[S.geo].fc.features;
 const fmt = (v, m) => v==null ? "—" : (m==="valuation_sum" ? "$"+Math.round(v).toLocaleString() : Math.abs(v) < 10 ? v.toLocaleString(undefined,{maximumFractionDigits:1}) : Math.round(v).toLocaleString());
 // Which metrics each class actually carries (e.g. new buildings and dwelling units exist only on building permits).
 const AVAIL = {};
-for (const f of D.tracts.features) for (const cls of Object.keys(CLASS_LABEL)) { const c = f.properties[cls]; if (!c) continue; const a = AVAIL[cls] || (AVAIL[cls] = new Set()); for (const yy of Object.values(c)) for (const [k, v] of Object.entries(yy)) if (v) a.add(k); }
+for (const f of D.geos.tract.fc.features) for (const cls of Object.keys(CLASS_LABEL)) { const c = f.properties[cls]; if (!c) continue; const a = AVAIL[cls] || (AVAIL[cls] = new Set()); for (const yy of Object.values(c)) for (const [k, v] of Object.entries(yy)) if (v) a.add(k); }
 function fillMetrics(){ const ms = document.getElementById("metric"); ms.innerHTML = ""; const avail = AVAIL[S.cls] || new Set();
   for (const m of Object.keys(METRICS)) { const o = document.createElement("option"); o.value = m; const ok = avail.has(m); o.textContent = METRICS[m] + (ok ? "" : " (not tracked for this class)"); o.disabled = !ok; ms.appendChild(o); }
   if (!avail.has(S.metric)) S.metric = "n_permits"; ms.value = S.metric; }
@@ -136,13 +138,13 @@ function value(p){
   let v = 0, any = false;
   for (let y = S.y0; y <= S.y1; y++){ const yy = c[String(y)]; if (yy && yy[S.metric]!=null){ v += yy[S.metric]; any = true; } }
   if (!any) return null;
-  if (S.perkm2 && p.arealand_km2 > 0) v = v / p.arealand_km2;
+  if (S.perkm2 && p.area_km2 > 0) v = v / p.area_km2;
   return v;
 }
 function quantiles(vals, n){ const s = vals.filter(v => v!=null && isFinite(v)).sort((a,b)=>a-b); if (!s.length) return []; return Array.from({length:n-1}, (_,i) => s[Math.floor((i+1)*s.length/n)]); }
 function render(){
   const div = S.metric === "du_net";
-  const vals = D.tracts.features.map(f => value(f.properties));
+  const vals = FEATS().map(f => value(f.properties));
   let breaks, colorOf;
   if (div){
     const abs = vals.map(v => v==null ? null : Math.abs(v));
@@ -154,17 +156,18 @@ function render(){
     colorOf = v => { if (v==null) return null; let i = 0; while (i < breaks.length && v > breaks[i]) i++; return RAMP[Math.min(i, RAMP.length-1)]; };
   }
   if (layer) layer.remove();
-  layer = L.geoJSON(D.tracts, {
+  layer = L.geoJSON(D.geos[S.geo].fc, {
     style: f => { const c = colorOf(value(f.properties)); return {weight:0.5, color:"#ffffff", opacity:0.9, fillColor: c || "#ffffff", fillOpacity: c ? 0.88 : 0}; },
     onEachFeature: (f, l) => l.on("mouseover", () => {
       const p = f.properties, v = value(p);
       const acs = p.acs ? `<div class="m">income ${p.acs.median_hh_income ? "$"+p.acs.median_hh_income.toLocaleString() : "—"} · renters ${p.acs.renter_share!=null ? Math.round(p.acs.renter_share*100)+"%" : "—"} · built ${p.acs.median_year_built || "—"}</div>` : "";
-      l.bindTooltip(`<b>Tract ${p.geoid.slice(5,9)}.${p.geoid.slice(9)}</b><div>${METRICS[S.metric]}${S.perkm2 ? " per km²" : ""}, ${S.y0}–${S.y1}: <b>${fmt(v, S.metric)}</b></div>${acs}`, {className:"pc", sticky:true, direction:"top"}).openTooltip();
+      const title = S.geo === "tract" ? `Tract ${p.name}` : S.geo === "zip" ? `ZIP ${p.name}` : S.geo === "council_district" ? `Council district ${p.name}` : p.name;
+      l.bindTooltip(`<b>${title}</b><div>${METRICS[S.metric]}${S.perkm2 ? " per km²" : ""}, ${S.y0}–${S.y1}: <b>${fmt(v, S.metric)}</b></div>${acs}`, {className:"pc", sticky:true, direction:"top"}).openTooltip();
     })
   }).addTo(map);
   cdLayer.addTo(map); cdLayer.bringToFront();
   const lg = document.getElementById("legend");
-  const cap = `<div class="cap">${METRICS[S.metric]}${S.perkm2 ? " per km²" : ""}, ${S.y0}–${S.y1}</div>`;
+  const cap = `<div class="cap">${METRICS[S.metric]}${S.perkm2 ? " per km²" : ""}, ${S.y0}–${S.y1} · ${D.geos[S.geo].label.toLowerCase()}</div>`;
   const rows = div
     ? DIV.map((c,i) => `<div class="row"><span class="sw" style="background:${c}"></span><span>${i===0 ? "≤ "+fmt(breaks[0]) : i===DIV.length-1 ? "≥ "+fmt(breaks[4]) : i===4 ? "0" : ""}</span></div>`)
     : RAMP.map((c,i) => `<div class="row"><span class="sw" style="background:${c}"></span><span>${i < breaks.length ? "≤ "+fmt(breaks[i], S.metric) : "> "+fmt(breaks[breaks.length-1], S.metric)}</span></div>`);
@@ -193,8 +196,11 @@ function chart(){
   const leg = classes.map(c => `<span style="display:inline-flex;align-items:center;gap:6px;margin:6px 12px 0 0;font-size:12px;color:var(--ink-2)"><span style="width:14px;height:3px;background:${CLASS_COLOR[c]};display:inline-block"></span>${CLASS_LABEL[c]}</span>`).join("");
   document.getElementById("chart").innerHTML = s + leg + `<div style="font-size:11px;color:var(--ink-3);margin-top:6px">${D.years.end} is partial.</div>`;
 }
-document.getElementById("notes").innerHTML = `<p><strong>How permits were located.</strong> ${(100*D.located/D.total).toFixed(1)}% of ${D.total.toLocaleString()} records: the department's own coordinates where published, the city's BOE geometry service by reference number, then the county CAMS and city centerline locators (score ≥ 90, match type checked).</p><p>Sources: LADBS and Bureau of Engineering tables on data.lacity.org; boundaries from the LA GeoHub and maps.lacity.org; tracts and demographics from the U.S. Census Bureau (ACS 2020–2024). Dashed lines are council districts. Tracts with no permits are unshaded.</p><p>Built with <a href="https://github.com/ssorkin/plancheck" style="color:var(--accent-ink)">plancheck</a>.</p>`;
+document.getElementById("notes").innerHTML = `<p><strong>How permits were located.</strong> ${(100*D.located/D.total).toFixed(1)}% of ${D.total.toLocaleString()} records: the department's own coordinates where published, the city's BOE geometry service by reference number, then the county CAMS and city centerline locators (score ≥ 90, match type checked).</p><p>Sources: LADBS and Bureau of Engineering tables on data.lacity.org; boundaries from the LA GeoHub and maps.lacity.org; tracts and demographics from the U.S. Census Bureau (ACS 2020–2024). Dashed lines are council districts. Areas with no permits are unshaded. School attendance areas are LAUSD's MP25 partition dissolved per level and named for the resident school; neighborhoods are the city GeoHub set.</p><p>Built with <a href="https://github.com/ssorkin/plancheck" style="color:var(--accent-ink)">plancheck</a>.</p>`;
 
+const gs = document.getElementById("geo");
+for (const [slug, g] of Object.entries(D.geos)) { const o = document.createElement("option"); o.value = slug; o.textContent = `${g.label} (${g.fc.features.length})`; gs.appendChild(o); }
+gs.value = S.geo; gs.onchange = () => { S.geo = gs.value; render(); };
 fillMetrics();
 for (const id of ["y0","y1"]) { const el = document.getElementById(id); el.min = D.years.start; el.max = D.years.end; el.value = S[id];
   el.oninput = () => { S[id] = +el.value; if (S.y0 > S.y1) { if (id==="y0") S.y1 = S.y0; else S.y0 = S.y1; } document.getElementById("y0").value = S.y0; document.getElementById("y1").value = S.y1; document.getElementById("yr0").textContent = S.y0; document.getElementById("yr1").textContent = S.y1; render(); }; }

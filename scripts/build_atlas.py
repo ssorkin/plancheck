@@ -16,29 +16,37 @@ args = [a for a in sys.argv[1:] if not a.startswith("--")]
 STANDALONE = "--standalone" in sys.argv  # full document, dark by default, with a theme toggle
 OUT = Path(args[0]) if args else EXPORT / "atlas.html"
 
-tracts = json.loads((EXPORT / "tracts.geojson").read_text())
 cds = json.loads((EXPORT / "council_districts.geojson").read_text())
 city = json.loads((EXPORT / "city_boundary.geojson").read_text())
 series = json.loads((EXPORT / "series.json").read_text())
 meta = json.loads((EXPORT / "meta.json").read_text())
 
-# Trim tract properties to what the page uses (building + right_of_way, listed metrics).
+# Trim properties to what the page uses; every geography shares one shape.
 KEEP = ["n_permits", "n_new_building", "n_adu", "n_solar", "valuation_sum", "du_net"]
-for f in tracts["features"]:
-    p = f["properties"]
-    slim = {"geoid": p["geoid"], "arealand_km2": p["arealand_km2"]}
-    for cls in ("building", "electrical", "mechanical", "right_of_way"):
-        if cls in p:
-            slim[cls] = {y: {k: v for k, v in yy.items() if k in KEEP} for y, yy in p[cls].items()}
-    if "acs" in p:
-        slim["acs"] = p["acs"]
-    f["properties"] = slim
+ORDER = ["tract", "lausd_elementary", "lausd_middle", "lausd_high", "neighborhood",
+         "council_district", "zip"]
+geos = {}
+for slug in ORDER:
+    g = meta["geographies"].get(slug)
+    if not g:
+        continue
+    fc = json.loads((EXPORT / g["file"]).read_text())
+    for f in fc["features"]:
+        p = f["properties"]
+        slim = {"id": p["id"], "name": p["name"], "area_km2": p["area_km2"]}
+        for cls in ("building", "electrical", "mechanical", "right_of_way"):
+            if cls in p:
+                slim[cls] = {y: {k: v for k, v in yy.items() if k in KEEP} for y, yy in p[cls].items()}
+        if "acs" in p:
+            slim["acs"] = p["acs"]
+        f["properties"] = slim
+    geos[slug] = {"label": g["label"], "fc": fc}
 
 cov = meta["geocode_coverage"]
 total = sum(r["n"] for r in cov)
 located = sum(r["n"] for r in cov if r["method"] != "none")
 years = meta["config"]["years"]
-payload = {"tracts": tracts, "cds": cds, "city": city, "series": series,
+payload = {"geos": geos, "cds": cds, "city": city, "series": series,
            "years": years, "generated": meta["generated"][:10],
            "total": total, "located": located}
 blob = json.dumps(payload, separators=(",", ":")).replace("</", "<\\/")

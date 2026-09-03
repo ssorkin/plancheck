@@ -1,9 +1,11 @@
-"""Exports for the map page: simplified tract GeoJSON with per-year metrics, hex GeoJSON,
-district GeoJSON, citywide series and a config echo. Also the self-contained map.html."""
+"""Exports for the map pages: one GeoJSON per geography (tracts, neighborhoods, council
+districts, ZIP codes, LAUSD attendance areas, H3 hexes) carrying per-class, per-year metrics
+in the same property shape, plus outline layers, citywide series and a config echo."""
 
 from __future__ import annotations
 
 import json
+import math
 from datetime import UTC, datetime
 
 import polars as pl
@@ -24,6 +26,33 @@ METRICS = [
     "valuation_sum",
     "du_net",
 ]
+CLASSES = ("building", "electrical", "mechanical", "right_of_way")
+
+# geography slug -> (intensity parquet stem, ref layer, page label, simplify tolerance)
+GEOGRAPHIES = {
+    "tract": ("intensity_tract", None, "Census tracts", 0.0004),
+    "neighborhood": ("intensity_neighborhood", "neighborhoods", "Neighborhoods", 0.0006),
+    "council_district": (
+        "intensity_council_district",
+        "council_districts",
+        "Council districts",
+        0.0006,
+    ),
+    "zip": ("intensity_zip", "zip_codes", "ZIP codes", 0.0006),
+    "lausd_elementary": (
+        "intensity_lausd_elementary",
+        "lausd_elementary",
+        "Elementary attendance areas",
+        0.0005,
+    ),
+    "lausd_middle": (
+        "intensity_lausd_middle",
+        "lausd_middle",
+        "Middle school attendance areas",
+        0.0006,
+    ),
+    "lausd_high": ("intensity_lausd_high", "lausd_high", "High school attendance areas", 0.0006),
+}
 
 
 def _round(x):
@@ -39,13 +68,19 @@ def _simplify(geom, tol: float):
     return g if not g.is_empty else geom
 
 
+def area_km2(geom) -> float:
+    """Planar area of a WGS84 polygon scaled to km² at its own latitude (≈1% accuracy)."""
+    lat = geom.centroid.y
+    return geom.area * (111.32**2) * math.cos(math.radians(lat))
+
+
 def _metrics_by_geo(intensity: pl.DataFrame, permit_class: str, years) -> dict[str, dict]:
     d = intensity.filter(
         (pl.col("permit_class") == permit_class) & pl.col("year").is_between(*years)
     )
     out: dict[str, dict] = {}
     for row in d.iter_rows(named=True):
-        g = out.setdefault(row["geo_id"], {})
+        g = out.setdefault(str(row["geo_id"]), {})
         y = g.setdefault(str(row["year"]), {})
         for m in METRICS:
             v = row.get(m)
@@ -58,17 +93,50 @@ def _metrics_by_geo(intensity: pl.DataFrame, permit_class: str, years) -> dict[s
     return out
 
 
-def export_tracts(intensity: pl.DataFrame, acs: pl.DataFrame | None, years, tol=0.0004) -> int:
-    tracts = pl.read_parquet(PARQUET_DIR / "tracts" / "data.parquet")
-    by_geo = {
-        cls: _metrics_by_geo(intensity, cls, years)
-        for cls in ("building", "electrical", "mechanical", "right_of_way")
-    }
-    acs_map = {r["geoid"]: r for r in acs.iter_rows(named=True)} if acs is not None else {}
+def _write_fc(name: str, feats: list[dict]) -> int:
+    (EXPORT_DIR / f"{name}.geojson").write_text(
+        json.dumps({"type": "FeatureCollection", "features": feats}, separators=(",", ":"))
+    )
+    return len(feats)
+
+
+def export_geography(slug: str, ahj_slug: str, years, acs: pl.DataFrame | None) -> int:
+    stem, layer, _label, tol = GEOGRAPHIES[slug]
+    ip = PARQUET_DIR / "analysis" / f"{stem}.parquet"
+    if not ip.exists():
+        return 0
+    intensity = pl.read_parquet(ip)
+    by_geo = {cls: _metrics_by_geo(intensity, cls, years) for cls in CLASSES}
+    if layer is None:
+        ref = pl.read_parquet(PARQUET_DIR / "tracts" / "data.parquet").select(
+            pl.col("geoid").alias("id"),
+            (pl.col("geoid").str.slice(5, 4) + "." + pl.col("geoid").str.slice(9)).alias("name"),
+            (pl.col("arealand_m2") / 1e6).alias("area_km2"),
+            "wkb",
+        )
+    else:
+        p = PARQUET_DIR / "ref" / f"ahj={ahj_slug}" / f"layer={layer}" / "data.parquet"
+        if not p.exists():
+            return 0
+        ref = (
+            pl.read_parquet(p)
+            .select("id", "name", "wkb")
+            .with_columns(pl.lit(None, dtype=pl.Float64).alias("area_km2"))
+        )
+    acs_map = (
+        {r["geoid"]: r for r in acs.iter_rows(named=True)}
+        if (acs is not None and layer is None)
+        else {}
+    )
     feats = []
-    for r in tracts.iter_rows(named=True):
-        gid = r["geoid"]
-        props = {"geoid": gid, "arealand_km2": round(r["arealand_m2"] / 1e6, 4)}
+    for r in ref.iter_rows(named=True):
+        gid = r["id"]
+        geom = from_wkb(r["wkb"])
+        props = {
+            "id": gid,
+            "name": r["name"],
+            "area_km2": round(r["area_km2"] if r["area_km2"] is not None else area_km2(geom), 4),
+        }
         has_any = False
         for cls, m in by_geo.items():
             if gid in m:
@@ -91,36 +159,28 @@ def export_tracts(intensity: pl.DataFrame, acs: pl.DataFrame | None, years, tol=
                 )
                 if a.get(k) is not None
             }
-        feats.append(_feature(_simplify(from_wkb(r["wkb"]), tol), props))
-    (EXPORT_DIR / "tracts.geojson").write_text(
-        json.dumps({"type": "FeatureCollection", "features": feats}, separators=(",", ":"))
-    )
-    return len(feats)
+        feats.append(_feature(_simplify(geom, tol), props))
+    return _write_fc(f"geo_{slug}", feats)
 
 
 def export_hex(intensity_h3: pl.DataFrame, years) -> int:
     import h3
     from shapely.geometry import Polygon
 
-    by_geo = {
-        cls: _metrics_by_geo(intensity_h3, cls, years) for cls in ("building", "right_of_way")
-    }
+    by_geo = {cls: _metrics_by_geo(intensity_h3, cls, years) for cls in CLASSES}
     cells = set().union(*(m.keys() for m in by_geo.values()))
     feats = []
     for cell in sorted(cells):
         ring = [(round(lon, 5), round(lat, 5)) for lat, lon in h3.cell_to_boundary(cell)]
-        props = {"h3": cell}
+        props = {"id": cell, "name": cell, "area_km2": 0.737}
         for cls, m in by_geo.items():
             if cell in m:
                 props[cls] = m[cell]
         feats.append(_feature(Polygon(ring), props))
-    (EXPORT_DIR / "hex_r8.geojson").write_text(
-        json.dumps({"type": "FeatureCollection", "features": feats}, separators=(",", ":"))
-    )
-    return len(feats)
+    return _write_fc("geo_hex_r8", feats)
 
 
-def export_districts(ahj_slug: str, tol=0.0006) -> int:
+def export_outlines(ahj_slug: str, tol=0.0006) -> int:
     n = 0
     for layer in ("council_districts", "community_plan_areas", "city_boundary"):
         p = PARQUET_DIR / "ref" / f"ahj={ahj_slug}" / f"layer={layer}" / "data.parquet"
@@ -131,14 +191,11 @@ def export_districts(ahj_slug: str, tol=0.0006) -> int:
             _feature(_simplify(from_wkb(r["wkb"]), tol), {"id": r["id"], "name": r["name"]})
             for r in df.iter_rows(named=True)
         ]
-        (EXPORT_DIR / f"{layer}.geojson").write_text(
-            json.dumps({"type": "FeatureCollection", "features": feats}, separators=(",", ":"))
-        )
-        n += len(feats)
+        n += _write_fc(layer, feats)
     return n
 
 
-def run_export(inline: bool = False) -> None:
+def run_export(inline: bool = False, ahj_slug: str = "la_city") -> None:
     from plancheck.analysis.acs import tract_covariates
     from plancheck.analysis.leaflet import write_map_html
 
@@ -146,13 +203,25 @@ def run_export(inline: bool = False) -> None:
     years = (cfg["years"]["start"], cfg["years"]["end"])
     EXPORT_DIR.mkdir(parents=True, exist_ok=True)
     a = PARQUET_DIR / "analysis"
-    intensity = pl.read_parquet(a / "intensity_tract.parquet")
-    n = export_tracts(intensity, tract_covariates(), years)
-    print(f"  tracts.geojson: {n:,} tracts")
+    acs = tract_covariates()
+    geographies = {}
+    for slug, (_stem, _layer, label, _tol) in GEOGRAPHIES.items():
+        n = export_geography(slug, ahj_slug, years, acs)
+        if n:
+            geographies[slug] = {"label": label, "features": n, "file": f"geo_{slug}.geojson"}
+            print(f"  geo_{slug}.geojson: {n:,} areas")
     h3p = a / "intensity_h3_r8.parquet"
     if h3p.exists():
-        print(f"  hex_r8.geojson: {export_hex(pl.read_parquet(h3p), years):,} cells")
-    print(f"  district layers: {export_districts('la_city'):,} features")
+        n = export_hex(pl.read_parquet(h3p), years)
+        geographies["hex_r8"] = {
+            "label": "Hex cells (H3 r8)",
+            "features": n,
+            "file": "geo_hex_r8.geojson",
+        }
+        print(f"  geo_hex_r8.geojson: {n:,} cells")
+    # Back-compatible alias for the tract layer.
+    (EXPORT_DIR / "tracts.geojson").write_bytes((EXPORT_DIR / "geo_tract.geojson").read_bytes())
+    print(f"  outline layers: {export_outlines(ahj_slug):,} features")
     series = pl.read_parquet(a / "series_class.parquet")
     (EXPORT_DIR / "series.json").write_text(json.dumps(series.to_dicts(), separators=(",", ":")))
     cov = pl.read_parquet(a / "geocode_coverage.parquet")
@@ -161,14 +230,12 @@ def run_export(inline: bool = False) -> None:
         "config": cfg,
         "geocode_coverage": cov.to_dicts(),
         "metrics": METRICS,
+        "geographies": geographies,
     }
     (EXPORT_DIR / "meta.json").write_text(json.dumps(meta, separators=(",", ":"), default=str))
+    print(f"  wrote {EXPORT_DIR.relative_to(REPO_ROOT)}/geo_*.geojson, series.json, meta.json")
+    out = write_map_html(inline=inline)
     print(
-        f"  wrote {EXPORT_DIR.relative_to(REPO_ROOT)}/{{tracts,hex_r8,*}}.geojson, series.json, meta.json"
+        f"  wrote {out.relative_to(REPO_ROOT)}"
+        + (f" ({out.stat().st_size / 1e6:.1f} MB)" if inline else "")
     )
-    if inline:
-        out = write_map_html(inline=True)
-        print(f"  wrote {out.relative_to(REPO_ROOT)} ({out.stat().st_size / 1e6:.1f} MB)")
-    else:
-        out = write_map_html(inline=False)
-        print(f"  wrote {out.relative_to(REPO_ROOT)} (loads ../data/export/*.geojson)")

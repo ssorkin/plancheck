@@ -21,6 +21,11 @@ GEOGRAPHIES = {
     "nc": "nc_id",
     "h3_r8": "h3_r8",
     "zoning_category": "zoning_category",
+    "neighborhood": "neighborhoods_id",
+    "zip": "zip_codes_id",
+    "lausd_elementary": "lausd_elementary_id",
+    "lausd_middle": "lausd_middle_id",
+    "lausd_high": "lausd_high_id",
 }
 
 
