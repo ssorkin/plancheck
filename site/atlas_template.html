@@ -29,6 +29,12 @@ body { margin: 0; background: var(--ground); color: var(--ink); font: 15px/1.5 "
 .sheet { max-width: 1320px; margin: 0 auto; padding: 20px 20px 40px; display: grid; gap: 16px; }
 .titleblock { display: grid; grid-template-columns: 1fr auto; gap: 8px 24px; align-items: end; border-top: 3px solid var(--ink); border-bottom: 1px solid var(--rule-strong); padding: 14px 0 12px; }
 .titleblock h1 { margin: 0; font: 700 44px/1 "Barlow Condensed", "Arial Narrow", sans-serif; letter-spacing: .01em; text-wrap: balance; }
+.titleblock h1 a { color: inherit; text-decoration: none; }
+.titleblock h1 a:hover { color: var(--accent-ink); }
+.actions { display: flex; gap: 8px; margin-top: 4px; }
+.btn { flex: 1; font: 500 11px/1 "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); background: transparent; border: 1px solid var(--rule-strong); padding: 8px 10px; border-radius: 2px; cursor: pointer; }
+.btn:hover { color: var(--ink); border-color: var(--ink-3); }
+.btn.ok { color: var(--accent-ink); border-color: var(--accent); }
 .titleblock .sub { color: var(--ink-2); max-width: 62ch; margin: 6px 0 0; }
 .stamps { display: grid; grid-template-columns: repeat(3, auto); gap: 0 22px; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 12px; color: var(--ink-2); }
 .stamps b { display: block; font: 600 26px/1.1 "Barlow Condensed", "Arial Narrow", sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -76,7 +82,7 @@ select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px s
 <div class="sheet">
   <div class="titleblock">
     <div>
-      <h1>LA Permit Atlas</h1>
+      <h1><a href="./" id="home" title="Reset the map">LA Permit Atlas</a></h1>
       <p class="sub">Every building, trade and right-of-way permit the City of Los Angeles publishes, located and summed by census tract, school attendance area, neighborhood, council district or ZIP code. Issued permits only; each area shaded by the chosen measure over the chosen years.</p>
     </div>
     <div class="stamps">
@@ -100,6 +106,7 @@ select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px s
             <label>To <span class="yrlbl" id="yr1"></span><input id="y1" type="range"></label>
           </div>
           <label>Normalize <select id="norm"><option value="pop">Per 1,000 residents</option><option value="units">Per 1,000 housing units</option><option value="acre">Per acre of land</option><option value="none">Totals</option></select></label>
+          <div class="actions"><button id="share" class="btn" type="button" title="Copy a link to this exact view">Share link</button><button id="reset" class="btn" type="button" title="Back to the default view">Reset</button></div>
         </div>
       </div>
       <div class="panel"><h2>Legend</h2><div class="legend" id="legend"></div></div>
@@ -116,7 +123,9 @@ const RAMP = ["#cde2fb","#b7d3f6","#9ec5f4","#86b6ef","#6da7ec","#5598e7","#3987
 const DIV = ["#0d366b","#256abf","#6da7ec","#cde2fb","#eceef1","#f5b8b8","#ee8080","#e34948","#8f1f1f"];
 const CLASS_COLOR = {building:"#2a78d6", electrical:"#eb6834", mechanical:"#1baf7a", right_of_way:"#eda100"};
 const CLASS_LABEL = {building:"Building", electrical:"Electrical", mechanical:"Mechanical", right_of_way:"Right-of-way"};
-const S = {geo:"tract", cls:"building", metric:"n_permits", y0:D.years.start, y1:D.years.end, norm:"pop"};
+const DEFAULTS = {geo:"tract", cls:"building", metric:"n_permits", y0:D.years.start, y1:D.years.end, norm:"pop"};
+const S = {...DEFAULTS};
+const SHARE_BASE = /*__SHARE_BASE__*/null;  // set for the embedded build; the site shares its own URL
 const NORMS = {pop:"per 1,000 residents", units:"per 1,000 housing units", acre:"per acre", none:""};
 // Permalink: every control lives in the URL hash (#geo=tract&cls=building&metric=n_permits&y0=2013&y1=2026&per=1).
 (function restore(){ const h = new URLSearchParams(location.hash.replace(/^#/, "")); if (h.get("geo") && D.geos[h.get("geo")]) S.geo = h.get("geo"); if (h.get("cls") && CLASS_LABEL[h.get("cls")]) S.cls = h.get("cls"); if (h.get("metric") && METRICS[h.get("metric")]) S.metric = h.get("metric"); if (h.get("y0")) S.y0 = Math.max(D.years.start, Math.min(D.years.end, +h.get("y0"))); if (h.get("y1")) S.y1 = Math.max(S.y0, Math.min(D.years.end, +h.get("y1"))); if (h.get("norm") && NORMS[h.get("norm")] != null) S.norm = h.get("norm"); else if (h.get("per") != null) S.norm = h.get("per") === "0" ? "none" : "acre"; const v = (h.get("v") || "").split(",").map(Number); if (v.length === 3 && v.every(Number.isFinite)) S.view = v; })();
@@ -233,6 +242,19 @@ document.getElementById("yr0").textContent = S.y0; document.getElementById("yr1"
 for (const id of ["cls","metric"]) { const el = document.getElementById(id); el.value = S[id]; el.onchange = () => { S[id] = el.value; if (id === "cls") fillMetrics(); render(); }; }
 const ns = document.getElementById("norm"); ns.value = S.norm; ns.onchange = () => { S.norm = ns.value; render(); };
 chart(); render();
+function syncControls(){ document.getElementById("geo").value = S.geo; document.getElementById("cls").value = S.cls; fillMetrics(); document.getElementById("norm").value = S.norm; for (const id of ["y0","y1"]) document.getElementById(id).value = S[id]; document.getElementById("yr0").textContent = S.y0; document.getElementById("yr1").textContent = S.y1; }
+function reset(){ Object.assign(S, DEFAULTS); delete S.view; syncControls(); map.fitBounds(L.geoJSON(D.city).getBounds()); render(); }
+document.getElementById("reset").onclick = reset;
+document.getElementById("home").onclick = e => { e.preventDefault(); reset(); };
+const shareBtn = document.getElementById("share");
+shareBtn.onclick = async () => {
+  syncHash();
+  const url = SHARE_BASE ? SHARE_BASE + location.hash : location.href;
+  let ok = false;
+  try { await navigator.clipboard.writeText(url); ok = true; } catch (e) { try { window.prompt("Copy this link", url); ok = true; } catch (e2) {} }
+  shareBtn.textContent = ok ? "Link copied" : "Copy failed"; shareBtn.classList.toggle("ok", ok);
+  setTimeout(() => { shareBtn.textContent = "Share link"; shareBtn.classList.remove("ok"); }, 1800);
+};
 const tb = document.getElementById("theme");
 if (tb) { const cur = () => document.documentElement.dataset.theme || "dark"; const label = () => { tb.textContent = cur() === "dark" ? "Light" : "Dark"; };
   tb.onclick = () => { const n = cur() === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = n; try { localStorage.setItem("theme", n); } catch (e) {} label(); }; label(); }

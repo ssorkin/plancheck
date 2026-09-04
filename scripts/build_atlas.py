@@ -79,6 +79,7 @@ html = html.replace("/*__LEAFLET_CSS__*/", leaflet_css).replace("/*__DATA__*/nul
 if not STANDALONE:
     # The artifact cannot read the parquet store; send clicks to the live site.
     html = html.replace('/*__DETAIL_BASE__*/"detail.html"', f'"{SITE_URL}/detail.html"')
+    html = html.replace("/*__SHARE_BASE__*/null", f'"{SITE_URL}/"')
 if STANDALONE:
     yr = f"{years['start']}–{years['end']}"
     og_desc = (
